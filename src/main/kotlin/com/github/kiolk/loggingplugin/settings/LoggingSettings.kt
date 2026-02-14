@@ -1,4 +1,4 @@
-package com.example.loggingplugin.settings
+package com.github.kiolk.loggingplugin.settings
 
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project

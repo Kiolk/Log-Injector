@@ -1,4 +1,4 @@
-package com.example.loggingplugin.actions
+package com.github.kiolk.loggingplugin.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent

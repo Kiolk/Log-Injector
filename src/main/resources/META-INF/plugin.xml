@@ -1,7 +1,7 @@
 <idea-plugin>
-    <id>com.example.loggingplugin</id>
+    <id>com.github.kiolk.loggingplugin</id>
     <name>Logging Plugin</name>
-    <vendor email="support@example.com" url="https://www.example.com">Example</vendor>
+    <vendor email="support@example.com" url="https://github.com/kiolk/LoggingPlugin">Yauheni Slizh</vendor>
 
     <description><![CDATA[
     Automatically inserts and removes "Myfancy log" statements into methods.
@@ -12,19 +12,19 @@
     <depends>com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="LoggingOptions" anchor="right" factoryClass="com.example.loggingplugin.toolwindow.LoggingToolWindowFactory" icon="AllIcons.Actions.LogEvents"/>
+        <toolWindow id="LoggingOptions" anchor="right" factoryClass="com.github.kiolk.loggingplugin.toolwindow.LoggingToolWindowFactory" icon="AllIcons.Actions.LogEvents"/>
     </extensions>
 
     <actions>
-        <action id="InsertLogsAction" class="com.example.loggingplugin.actions.InsertLogsAction"
+        <action id="InsertLogsAction" class="com.github.kiolk.loggingplugin.actions.InsertLogsAction"
                 text="Insert Logs" description="Inserts logs into all methods of the current class">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="RemoveLogsAction" class="com.example.loggingplugin.actions.RemoveLogsAction"
+        <action id="RemoveLogsAction" class="com.github.kiolk.loggingplugin.actions.RemoveLogsAction"
                 text="Remove Logs" description="Removes all fancy logs from the current class">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="ShowToastAction" class="com.example.loggingplugin.actions.ShowToastAction"
+        <action id="ShowToastAction" class="com.github.kiolk.loggingplugin.actions.ShowToastAction"
                 text="Show Simple Toast" description="Shows a simple toast message">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>

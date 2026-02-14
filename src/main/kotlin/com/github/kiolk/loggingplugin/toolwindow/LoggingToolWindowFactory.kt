@@ -1,6 +1,6 @@
-package com.example.loggingplugin.toolwindow
+package com.github.kiolk.loggingplugin.toolwindow
 
-import com.example.loggingplugin.settings.LoggingSettings
+import com.github.kiolk.loggingplugin.settings.LoggingSettings
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory

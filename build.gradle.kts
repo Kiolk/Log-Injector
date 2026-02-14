@@ -8,7 +8,7 @@ plugins {
 }
 
 version = "1.0.0"
-group = "com.example.loggingplugin"
+group = "com.github.kiolk.loggingplugin"
 
 repositories {
     mavenCentral()
@@ -34,10 +34,10 @@ dependencies {
 
 intellijPlatform {
     pluginConfiguration {
-        id = "com.example.loggingplugin"
+        id = "com.github.kiolk.loggingplugin"
         name = "Logging Plugin"
         vendor {
-            name = "Example"
+            name = "Yauheni Slizh"
         }
         ideaVersion {
             sinceBuild = "243"

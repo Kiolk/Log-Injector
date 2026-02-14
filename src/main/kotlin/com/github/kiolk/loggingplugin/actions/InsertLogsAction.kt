@@ -1,6 +1,6 @@
-package com.example.loggingplugin.actions
+package com.github.kiolk.loggingplugin.actions
 
-import com.example.loggingplugin.settings.LoggingSettings
+import com.github.kiolk.loggingplugin.settings.LoggingSettings
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
