@@ -1,0 +1,21 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Gradle
+.gradle/
+build/
+local.properties
+.intellijPlatform/
+
+# Kotlin
+.kotlin/
+
+# macOS
+.DS_Store
+
+# Log files
+*.log

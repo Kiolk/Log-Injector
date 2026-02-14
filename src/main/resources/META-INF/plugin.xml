@@ -1,0 +1,27 @@
+<idea-plugin>
+    <id>com.example.loggingplugin</id>
+    <name>Logging Plugin</name>
+    <vendor email="support@example.com" url="https://www.example.com">Example</vendor>
+
+    <description><![CDATA[
+    Automatically inserts logs into methods.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.kotlin</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+    </extensions>
+
+    <actions>
+        <action id="InsertLogsAction" class="com.example.loggingplugin.actions.ShowToastAction"
+                text="Insert Logs" description="Inserts logs into all methods of the current class">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action id="ShowToastAction" class="com.example.loggingplugin.actions.InsertLogsAction"
+                text="Show Simple Toast" description="Shows a simple toast message">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
