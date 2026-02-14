@@ -39,7 +39,12 @@ class InsertLogsAction : AnAction() {
                     val body = method.body ?: return@forEach
                     if (body.text.contains("Myfancy log")) return@forEach
                     val lBrace = body.lBrace ?: return@forEach
-                    val statement = factory.createStatementFromText("System.out.println(\"Myfancy log\");", method)
+                    
+                    val paramsText = method.parameterList.parameters.joinToString(", ") { 
+                        "${it.name}=\" + ${it.name} + \"" 
+                    }
+                    val logMessage = "Myfancy log: ${method.name}($paramsText)"
+                    val statement = factory.createStatementFromText("System.out.println(\"$logMessage\");", method)
                     body.addAfter(statement, lBrace)
                 }
             } else if (psiFile is KtFile) {
@@ -55,7 +60,12 @@ class InsertLogsAction : AnAction() {
                     val body = function.bodyBlockExpression ?: return@forEach
                     if (body.text.contains("Myfancy log")) return@forEach
                     val lBrace = body.lBrace ?: return@forEach
-                    val expression = factory.createExpression("println(\"Myfancy log\")")
+                    
+                    val paramsText = function.valueParameters.joinToString(", ") { 
+                        "${it.name}=\${${it.name}}" 
+                    }
+                    val logMessage = "Myfancy log: ${function.name}($paramsText)"
+                    val expression = factory.createExpression("println(\"$logMessage\")")
                     body.addAfter(expression, lBrace)
                     body.addAfter(factory.createNewLine(), lBrace)
                 }

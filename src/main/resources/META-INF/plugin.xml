@@ -4,7 +4,7 @@
     <vendor email="support@example.com" url="https://www.example.com">Example</vendor>
 
     <description><![CDATA[
-    Automatically inserts logs into methods.
+    Automatically inserts and removes "Myfancy log" statements into methods.
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
@@ -15,11 +15,15 @@
     </extensions>
 
     <actions>
-        <action id="InsertLogsAction" class="com.example.loggingplugin.actions.ShowToastAction"
+        <action id="InsertLogsAction" class="com.example.loggingplugin.actions.InsertLogsAction"
                 text="Insert Logs" description="Inserts logs into all methods of the current class">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="ShowToastAction" class="com.example.loggingplugin.actions.InsertLogsAction"
+        <action id="RemoveLogsAction" class="com.example.loggingplugin.actions.RemoveLogsAction"
+                text="Remove Logs" description="Removes all fancy logs from the current class">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action id="ShowToastAction" class="com.example.loggingplugin.actions.ShowToastAction"
                 text="Show Simple Toast" description="Shows a simple toast message">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
