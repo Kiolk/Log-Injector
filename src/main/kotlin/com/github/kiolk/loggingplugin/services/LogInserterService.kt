@@ -78,6 +78,16 @@ class LogInserterService(private val project: Project) {
         }
     }
 
+    fun removeLogs(searchScope: PsiElement, logTag: String) {
+        if (searchScope.containingFile is PsiJavaFile) {
+            val statements = PsiTreeUtil.findChildrenOfType(searchScope, PsiExpressionStatement::class.java)
+            statements.filter { it.text.contains(logTag) }.forEach { it.delete() }
+        } else if (searchScope.containingFile is KtFile) {
+            val calls = PsiTreeUtil.findChildrenOfType(searchScope, KtCallExpression::class.java)
+            calls.filter { it.text.contains(logTag) }.forEach { it.delete() }
+        }
+    }
+
     private fun isLogAlreadyPresent(element: PsiElement, logContent: String): Boolean {
         var current = element
         while (current.parent != null && current.parent !is KtBlockExpression && current.parent !is PsiCodeBlock) {

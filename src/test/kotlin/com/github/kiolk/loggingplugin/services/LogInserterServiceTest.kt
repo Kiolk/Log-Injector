@@ -78,4 +78,56 @@ class LogInserterServiceTest : BasePlatformTestCase() {
 
         myFixture.checkResult(after)
     }
+
+    fun testRemoveKotlinLogs() {
+        val before = """
+            fun test() {
+                println("TestTag: some log")
+                var x = 1
+                println("OtherTag: other log")
+            }
+        """.trimIndent()
+
+        val after = """
+            fun test() {
+                var x = 1
+                println("OtherTag: other log")
+            }
+        """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+        
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag")
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testRemoveJavaLogs() {
+        val before = """
+            public class Test {
+                public void test() {
+                    System.out.println("TestTag: log");
+                    int x = 1;
+                }
+            }
+        """.trimIndent()
+
+        val after = """
+            public class Test {
+                public void test() {
+                    int x = 1;
+                }
+            }
+        """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.java", before)
+        
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag")
+        }
+
+        myFixture.checkResult(after)
+    }
 }
