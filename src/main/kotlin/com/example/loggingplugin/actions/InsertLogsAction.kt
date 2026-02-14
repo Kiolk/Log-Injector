@@ -1,5 +1,6 @@
 package com.example.loggingplugin.actions
 
+import com.example.loggingplugin.settings.LoggingSettings
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -19,6 +20,7 @@ class InsertLogsAction : AnAction() {
         val editor = e.getData(CommonDataKeys.EDITOR) ?: return
         val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return
         val elementAtCaret = psiFile.findElementAt(editor.caretModel.offset)
+        val settings = LoggingSettings.getInstance(project).state
 
         WriteCommandAction.runWriteCommandAction(project) {
             if (psiFile is PsiJavaFile) {
@@ -26,36 +28,37 @@ class InsertLogsAction : AnAction() {
                 val searchScope = targetClass ?: psiFile
                 val factory = JavaPsiFacade.getElementFactory(project)
 
-                // 1. Insert logs at method start
-                val methods = PsiTreeUtil.findChildrenOfType(searchScope, PsiMethod::class.java)
-                methods.forEach { method ->
-                    val body = method.body ?: return@forEach
-                    if (body.text.contains("Myfancy log: ${method.name}")) return@forEach
-                    val lBrace = body.lBrace ?: return@forEach
-                    
-                    val paramsText = method.parameterList.parameters.joinToString(", ") { 
-                        "${it.name}=\" + ${it.name} + \"" 
+                if (settings.trackMethodExecution) {
+                    val methods = PsiTreeUtil.findChildrenOfType(searchScope, PsiMethod::class.java)
+                    methods.forEach { method ->
+                        val body = method.body ?: return@forEach
+                        if (body.text.contains("Myfancy log: ${method.name}")) return@forEach
+                        val lBrace = body.lBrace ?: return@forEach
+                        
+                        val paramsText = method.parameterList.parameters.joinToString(", ") { 
+                            "${it.name}=\" + ${it.name} + \"" 
+                        }
+                        val logMessage = "Myfancy log: ${method.name}($paramsText)"
+                        val statement = factory.createStatementFromText("System.out.println(\"$logMessage\");", method)
+                        body.addAfter(statement, lBrace)
                     }
-                    val logMessage = "Myfancy log: ${method.name}($paramsText)"
-                    val statement = factory.createStatementFromText("System.out.println(\"$logMessage\");", method)
-                    body.addAfter(statement, lBrace)
                 }
 
-                // 2. Insert logs after assignments
-                val assignments = PsiTreeUtil.findChildrenOfType(searchScope, PsiAssignmentExpression::class.java)
-                assignments.forEach { assignment ->
-                    val varName = assignment.lExpression.text
-                    if (assignment.parent.parent.text.contains("Myfancy log: $varName assigned")) return@forEach
-                    
-                    val logStatement = "System.out.println(\"Myfancy log: $varName assigned new value: \" + $varName);"
-                    val statement = factory.createStatementFromText(logStatement, assignment)
-                    
-                    // Find the actual statement to insert after
-                    var current: PsiElement = assignment
-                    while (current.parent !is PsiCodeBlock && current.parent != null) {
-                        current = current.parent
+                if (settings.trackAssignments) {
+                    val assignments = PsiTreeUtil.findChildrenOfType(searchScope, PsiAssignmentExpression::class.java)
+                    assignments.forEach { assignment ->
+                        val varName = assignment.lExpression.text
+                        if (assignment.parent.parent.text.contains("Myfancy log: $varName assigned")) return@forEach
+                        
+                        val logStatement = "System.out.println(\"Myfancy log: $varName assigned new value: \" + $varName);"
+                        val statement = factory.createStatementFromText(logStatement, assignment)
+                        
+                        var current: PsiElement = assignment
+                        while (current.parent !is PsiCodeBlock && current.parent != null) {
+                            current = current.parent
+                        }
+                        current.parent?.addAfter(statement, current)
                     }
-                    current.parent?.addAfter(statement, current)
                 }
 
             } else if (psiFile is KtFile) {
@@ -63,43 +66,44 @@ class InsertLogsAction : AnAction() {
                 val searchScope = targetClass ?: psiFile
                 val factory = KtPsiFactory(project)
 
-                // 1. Insert logs at function start
-                val functions = PsiTreeUtil.findChildrenOfType(searchScope, KtNamedFunction::class.java)
-                functions.forEach { function ->
-                    val body = function.bodyBlockExpression ?: return@forEach
-                    if (body.text.contains("Myfancy log: ${function.name}")) return@forEach
-                    val lBrace = body.lBrace ?: return@forEach
-                    
-                    val paramsText = function.valueParameters.joinToString(", ") { 
-                        "${it.name}=\${${it.name}}" 
+                if (settings.trackMethodExecution) {
+                    val functions = PsiTreeUtil.findChildrenOfType(searchScope, KtNamedFunction::class.java)
+                    functions.forEach { function ->
+                        val body = function.bodyBlockExpression ?: return@forEach
+                        if (body.text.contains("Myfancy log: ${function.name}")) return@forEach
+                        val lBrace = body.lBrace ?: return@forEach
+                        
+                        val paramsText = function.valueParameters.joinToString(", ") { 
+                            "${it.name}=\${${it.name}}" 
+                        }
+                        val logMessage = "Myfancy log: ${function.name}($paramsText)"
+                        val expression = factory.createExpression("println(\"$logMessage\")")
+                        body.addAfter(expression, lBrace)
+                        body.addAfter(factory.createNewLine(), lBrace)
                     }
-                    val logMessage = "Myfancy log: ${function.name}($paramsText)"
-                    val expression = factory.createExpression("println(\"$logMessage\")")
-                    body.addAfter(expression, lBrace)
-                    body.addAfter(factory.createNewLine(), lBrace)
                 }
 
-                // 2. Insert logs after assignments
-                val assignments = PsiTreeUtil.findChildrenOfType(searchScope, KtBinaryExpression::class.java)
-                    .filter { it.operationToken in listOf(KtTokens.EQ, KtTokens.PLUSEQ, KtTokens.MINUSEQ, KtTokens.MULTEQ, KtTokens.DIVEQ, KtTokens.PERCEQ) }
-                
-                assignments.forEach { assignment ->
-                    val left = assignment.left ?: return@forEach
-                    val varName = left.text
+                if (settings.trackAssignments) {
+                    val assignments = PsiTreeUtil.findChildrenOfType(searchScope, KtBinaryExpression::class.java)
+                        .filter { it.operationToken in listOf(KtTokens.EQ, KtTokens.PLUSEQ, KtTokens.MINUSEQ, KtTokens.MULTEQ, KtTokens.DIVEQ, KtTokens.PERCEQ) }
                     
-                    val logStatement = "println(\"Myfancy log: $varName assigned new value: \${$varName}\")"
-                    val expression = factory.createExpression(logStatement)
-                    
-                    // Find the statement/expression to insert after in the block
-                    var current: PsiElement = assignment
-                    while (current.parent !is KtBlockExpression && current.parent != null) {
-                        current = current.parent
-                    }
-                    
-                    if (current.parent is KtBlockExpression) {
-                        val block = current.parent as KtBlockExpression
-                        block.addAfter(expression, current)
-                        block.addAfter(factory.createNewLine(), current)
+                    assignments.forEach { assignment ->
+                        val left = assignment.left ?: return@forEach
+                        val varName = left.text
+                        
+                        val logStatement = "println(\"Myfancy log: $varName assigned new value: \${$varName}\")"
+                        val expression = factory.createExpression(logStatement)
+                        
+                        var current: PsiElement = assignment
+                        while (current.parent !is KtBlockExpression && current.parent != null) {
+                            current = current.parent
+                        }
+                        
+                        if (current.parent is KtBlockExpression) {
+                            val block = current.parent as KtBlockExpression
+                            block.addAfter(expression, current)
+                            block.addAfter(factory.createNewLine(), current)
+                        }
                     }
                 }
             }
