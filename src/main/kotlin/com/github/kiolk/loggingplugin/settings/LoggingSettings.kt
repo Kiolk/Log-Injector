@@ -8,7 +8,8 @@ import com.intellij.openapi.project.Project
 class LoggingSettings : PersistentStateComponent<LoggingSettings.State> {
     data class State(
         var trackMethodExecution: Boolean = true,
-        var trackAssignments: Boolean = true
+        var trackAssignments: Boolean = true,
+        var logTag: String = "Myfancy log"
     )
 
     private var myState = State()

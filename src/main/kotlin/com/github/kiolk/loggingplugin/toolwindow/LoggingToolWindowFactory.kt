@@ -7,14 +7,18 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextArea
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.content.ContentFactory
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
 import java.awt.Font
-import java.awt.GridLayout
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
 import javax.swing.BorderFactory
 import javax.swing.BoxLayout
 import javax.swing.JPanel
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 
 class LoggingToolWindowFactory : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
@@ -23,9 +27,16 @@ class LoggingToolWindowFactory : ToolWindowFactory {
         val mainPanel = JPanel(BorderLayout())
         
         // Top panel for settings
-        val settingsPanel = JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        val settingsPanel = JPanel(GridBagLayout()).apply {
             border = JBUI.Borders.empty(10)
+        }
+
+        val constraints = GridBagConstraints().apply {
+            fill = GridBagConstraints.HORIZONTAL
+            weightx = 1.0
+            gridx = 0
+            gridy = 0
+            anchor = GridBagConstraints.WEST
         }
 
         val previewArea = JBTextArea().apply {
@@ -38,23 +49,32 @@ class LoggingToolWindowFactory : ToolWindowFactory {
         }
 
         fun updatePreview() {
+            val logTag = settings.state.logTag
             val preview = StringBuilder()
             if (settings.state.trackMethodExecution) {
                 preview.append("// Method Execution:\n")
                 preview.append("fun someMethod(arg: String) {\n")
-                preview.append("    println(\"Myfancy log: someMethod(arg=\$arg)\")\n")
+                preview.append("    println(\"$logTag: someMethod(arg=\$arg)\")\n")
                 preview.append("    // ...\n")
                 preview.append("}\n\n")
             }
             if (settings.state.trackAssignments) {
                 preview.append("// Assignments:\n")
                 preview.append("var x = 10\n")
-                preview.append("println(\"Myfancy log: x assigned new value: \$x\")\n")
+                preview.append("println(\"$logTag: x assigned new value: \$x\")\n")
             }
             if (!settings.state.trackMethodExecution && !settings.state.trackAssignments) {
                 preview.append("No tracking selected.")
             }
             previewArea.text = preview.toString()
+        }
+
+        val tagField = JBTextField(settings.state.logTag).apply {
+            document.addDocumentListener(object : DocumentListener {
+                override fun insertUpdate(e: DocumentEvent) { settings.state.logTag = text; updatePreview() }
+                override fun removeUpdate(e: DocumentEvent) { settings.state.logTag = text; updatePreview() }
+                override fun changedUpdate(e: DocumentEvent) { settings.state.logTag = text; updatePreview() }
+            })
         }
 
         val methodExecCheckbox = JBCheckBox("Track Method Execution", settings.state.trackMethodExecution).apply {
@@ -70,8 +90,13 @@ class LoggingToolWindowFactory : ToolWindowFactory {
             }
         }
 
-        settingsPanel.add(methodExecCheckbox)
-        settingsPanel.add(assignmentsCheckbox)
+        settingsPanel.add(JBLabel("Log Tag:"), constraints)
+        constraints.gridy++
+        settingsPanel.add(tagField, constraints)
+        constraints.gridy++
+        settingsPanel.add(methodExecCheckbox, constraints)
+        constraints.gridy++
+        settingsPanel.add(assignmentsCheckbox, constraints)
 
         mainPanel.add(settingsPanel, BorderLayout.NORTH)
         mainPanel.add(previewArea, BorderLayout.CENTER)

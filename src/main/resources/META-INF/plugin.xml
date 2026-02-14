@@ -24,9 +24,5 @@
                 text="Remove Logs" description="Removes all fancy logs from the current class">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="ShowToastAction" class="com.github.kiolk.loggingplugin.actions.ShowToastAction"
-                text="Show Simple Toast" description="Shows a simple toast message">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-        </action>
     </actions>
 </idea-plugin>
