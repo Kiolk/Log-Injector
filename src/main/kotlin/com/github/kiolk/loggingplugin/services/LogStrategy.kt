@@ -10,6 +10,8 @@ interface LogStrategy {
     fun createKotlinLog(factory: KtPsiFactory, tag: String, message: String): String
     fun createJavaLog(factory: PsiElementFactory, tag: String, message: String): String
     fun getRemovalPatterns(tag: String): List<String>
+    fun getKotlinImport(): String?
+    fun getJavaImport(): String?
 }
 
 class PrintlnStrategy : LogStrategy {
@@ -20,6 +22,9 @@ class PrintlnStrategy : LogStrategy {
         "System.out.println(\"$tag: $message\");"
 
     override fun getRemovalPatterns(tag: String): List<String> = listOf(tag)
+    
+    override fun getKotlinImport(): String? = null
+    override fun getJavaImport(): String? = null
 }
 
 class TimberStrategy : LogStrategy {
@@ -30,6 +35,9 @@ class TimberStrategy : LogStrategy {
         "Timber.tag(\"$tag\").d(\"$message\");"
 
     override fun getRemovalPatterns(tag: String): List<String> = listOf("Timber.tag(\"$tag\")", tag)
+    
+    override fun getKotlinImport(): String = "timber.log.Timber"
+    override fun getJavaImport(): String = "timber.log.Timber"
 }
 
 object LogStrategyFactory {

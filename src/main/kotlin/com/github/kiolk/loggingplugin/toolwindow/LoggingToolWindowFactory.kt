@@ -60,6 +60,11 @@ class LoggingToolWindowFactory : ToolWindowFactory {
             
             val ktFactory = org.jetbrains.kotlin.psi.KtPsiFactory(project)
 
+            val kotlinImport = strategy.getKotlinImport()
+            if (kotlinImport != null) {
+                preview.append("import $kotlinImport\n\n")
+            }
+
             if (state.trackMethodExecution) {
                 preview.append("// Method Execution:\n")
                 preview.append("fun someMethod(arg: String) {\n")

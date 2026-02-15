@@ -141,6 +141,8 @@ class LogInserterServiceTest : BasePlatformTestCase() {
         """.trimIndent()
 
         val after = """
+            import timber.log.Timber
+
             fun test() {
                 var x = 1
                 x = 2
@@ -165,6 +167,8 @@ class LogInserterServiceTest : BasePlatformTestCase() {
         """.trimIndent()
 
         val after = """
+            import timber.log.Timber
+
             fun test(param: String) {
                 Timber.tag("TestTag").d("test(param=${'$'}{param})")
                 val y = 0
@@ -230,5 +234,58 @@ class LogInserterServiceTest : BasePlatformTestCase() {
         }
 
         myFixture.checkResult(after)
+    }
+
+    fun testInsertTimberLogsWithImport() {
+        val before = """
+            package com.example
+
+            fun test() {
+                var x = 1
+                x = 2
+            }
+        """.trimIndent()
+
+        val after = """
+            package com.example
+
+            import timber.log.Timber
+
+            fun test() {
+                var x = 1
+                x = 2
+                Timber.tag("TestTag").d("x assigned new value: ${'$'}{x}")
+            }
+        """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+        
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testInsertTimberLogsWithExistingImport() {
+        val content = """
+            package com.example
+
+            import timber.log.Timber
+
+            fun test() {
+                var x = 1
+                x = 2
+                Timber.tag("TestTag").d("x assigned new value: ${'$'}{x}")
+            }
+        """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", content) as KtFile
+        
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
+        }
+
+        myFixture.checkResult(content)
     }
 }
