@@ -1,9 +1,13 @@
 package com.github.kiolk.loggingplugin.toolwindow
 
+import com.github.kiolk.loggingplugin.services.LogStrategyFactory
 import com.github.kiolk.loggingplugin.settings.LoggingSettings
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
+import com.intellij.ui.CollectionComboBoxModel
+import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextArea
@@ -15,7 +19,6 @@ import java.awt.Font
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import javax.swing.BorderFactory
-import javax.swing.BoxLayout
 import javax.swing.JPanel
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
@@ -37,6 +40,7 @@ class LoggingToolWindowFactory : ToolWindowFactory {
             gridx = 0
             gridy = 0
             anchor = GridBagConstraints.WEST
+            insets = JBUI.insets(2)
         }
 
         val previewArea = JBTextArea().apply {
@@ -49,24 +53,41 @@ class LoggingToolWindowFactory : ToolWindowFactory {
         }
 
         fun updatePreview() {
-            val logTag = settings.state.logTag
+            val state = settings.state
+            val logTag = state.logTag
+            val strategy = LogStrategyFactory.getStrategy(state.loggingFramework)
             val preview = StringBuilder()
-            if (settings.state.trackMethodExecution) {
+            
+            val ktFactory = org.jetbrains.kotlin.psi.KtPsiFactory(project)
+
+            if (state.trackMethodExecution) {
                 preview.append("// Method Execution:\n")
                 preview.append("fun someMethod(arg: String) {\n")
-                preview.append("    println(\"$logTag: someMethod(arg=\$arg)\")\n")
+                val logLine = strategy.createKotlinLog(ktFactory, logTag, "someMethod(arg=\$arg)")
+                preview.append("    $logLine\n")
                 preview.append("    // ...\n")
                 preview.append("}\n\n")
             }
-            if (settings.state.trackAssignments) {
+            if (state.trackAssignments) {
                 preview.append("// Assignments:\n")
                 preview.append("var x = 10\n")
-                preview.append("println(\"$logTag: x assigned new value: \$x\")\n")
+                val logLine = strategy.createKotlinLog(ktFactory, logTag, "x assigned new value: \$x")
+                preview.append("$logLine\n")
             }
-            if (!settings.state.trackMethodExecution && !settings.state.trackAssignments) {
+            if (!state.trackMethodExecution && !state.trackAssignments) {
                 preview.append("No tracking selected.")
             }
             previewArea.text = preview.toString()
+        }
+
+        val frameworkModel = CollectionComboBoxModel(LoggingSettings.LoggingFramework.entries)
+        val frameworkCombo = ComboBox(frameworkModel).apply {
+            renderer = SimpleListCellRenderer.create("") { it.displayName }
+            selectedItem = settings.state.loggingFramework
+            addActionListener {
+                settings.state.loggingFramework = selectedItem as LoggingSettings.LoggingFramework
+                updatePreview()
+            }
         }
 
         val tagField = JBTextField(settings.state.logTag).apply {
@@ -90,6 +111,10 @@ class LoggingToolWindowFactory : ToolWindowFactory {
             }
         }
 
+        settingsPanel.add(JBLabel("Logging System:"), constraints)
+        constraints.gridy++
+        settingsPanel.add(frameworkCombo, constraints)
+        constraints.gridy++
         settingsPanel.add(JBLabel("Log Tag:"), constraints)
         constraints.gridy++
         settingsPanel.add(tagField, constraints)

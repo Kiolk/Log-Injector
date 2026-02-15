@@ -1,0 +1,42 @@
+package com.github.kiolk.loggingplugin.services
+
+import com.github.kiolk.loggingplugin.settings.LoggingSettings
+import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElementFactory
+import org.jetbrains.kotlin.psi.KtPsiFactory
+
+interface LogStrategy {
+    fun createKotlinLog(factory: KtPsiFactory, tag: String, message: String): String
+    fun createJavaLog(factory: PsiElementFactory, tag: String, message: String): String
+    fun getRemovalPatterns(tag: String): List<String>
+}
+
+class PrintlnStrategy : LogStrategy {
+    override fun createKotlinLog(factory: KtPsiFactory, tag: String, message: String): String =
+        "println(\"$tag: $message\")"
+
+    override fun createJavaLog(factory: PsiElementFactory, tag: String, message: String): String =
+        "System.out.println(\"$tag: $message\");"
+
+    override fun getRemovalPatterns(tag: String): List<String> = listOf(tag)
+}
+
+class TimberStrategy : LogStrategy {
+    override fun createKotlinLog(factory: KtPsiFactory, tag: String, message: String): String =
+        "Timber.tag(\"$tag\").d(\"$message\")"
+
+    override fun createJavaLog(factory: PsiElementFactory, tag: String, message: String): String =
+        "Timber.tag(\"$tag\").d(\"$message\");"
+
+    override fun getRemovalPatterns(tag: String): List<String> = listOf("Timber.tag(\"$tag\")", tag)
+}
+
+object LogStrategyFactory {
+    fun getStrategy(framework: LoggingSettings.LoggingFramework): LogStrategy {
+        return when (framework) {
+            LoggingSettings.LoggingFramework.PRINTLN -> PrintlnStrategy()
+            LoggingSettings.LoggingFramework.TIMBER -> TimberStrategy()
+        }
+    }
+}

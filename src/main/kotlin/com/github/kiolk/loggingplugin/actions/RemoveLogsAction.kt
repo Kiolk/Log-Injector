@@ -21,7 +21,9 @@ class RemoveLogsAction : AnAction() {
         val editor = e.getData(CommonDataKeys.EDITOR) ?: return
         val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return
         val elementAtCaret = psiFile.findElementAt(editor.caretModel.offset)
-        val logTag = LoggingSettings.getInstance(project).state.logTag
+        val settings = LoggingSettings.getInstance(project).state
+        val logTag = settings.logTag
+        val framework = settings.loggingFramework
         val inserterService = LogInserterService.getInstance(project)
 
         WriteCommandAction.runWriteCommandAction(project) {
@@ -33,7 +35,7 @@ class RemoveLogsAction : AnAction() {
                 return@runWriteCommandAction
             }
             
-            inserterService.removeLogs(searchScope, logTag)
+            inserterService.removeLogs(searchScope, logTag, framework)
         }
     }
 

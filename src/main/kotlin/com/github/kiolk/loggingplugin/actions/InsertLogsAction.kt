@@ -40,12 +40,13 @@ class InsertLogsAction : AnAction() {
         val targetClass = PsiTreeUtil.getParentOfType(elementAtCaret, PsiClass::class.java)
         val searchScope = targetClass ?: psiFile
         val logTag = settings.logTag
+        val framework = settings.loggingFramework
 
         if (settings.trackMethodExecution) {
-            inserterService.insertJavaMethodLogs(searchScope, logTag)
+            inserterService.insertJavaMethodLogs(searchScope, logTag, framework)
         }
         if (settings.trackAssignments) {
-            inserterService.insertJavaAssignmentLogs(searchScope, logTag)
+            inserterService.insertJavaAssignmentLogs(searchScope, logTag, framework)
         }
     }
 
@@ -58,12 +59,13 @@ class InsertLogsAction : AnAction() {
         val targetClass = PsiTreeUtil.getParentOfType(elementAtCaret, KtClass::class.java)
         val searchScope = targetClass ?: psiFile
         val logTag = settings.logTag
+        val framework = settings.loggingFramework
 
         if (settings.trackMethodExecution) {
-            inserterService.insertKotlinMethodLogs(searchScope, logTag)
+            inserterService.insertKotlinMethodLogs(searchScope, logTag, framework)
         }
         if (settings.trackAssignments) {
-            inserterService.insertKotlinAssignmentLogs(searchScope, logTag)
+            inserterService.insertKotlinAssignmentLogs(searchScope, logTag, framework)
         }
     }
 
