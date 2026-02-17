@@ -7,13 +7,13 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.command.WriteCommandAction
-import com.intellij.psi.*
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtFile
 
 class RemoveLogsAction : AnAction() {
-
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -27,14 +27,15 @@ class RemoveLogsAction : AnAction() {
         val inserterService = LogInserterService.getInstance(project)
 
         WriteCommandAction.runWriteCommandAction(project) {
-            val searchScope = if (psiFile is PsiJavaFile) {
-                PsiTreeUtil.getParentOfType(elementAtCaret, PsiClass::class.java) ?: psiFile
-            } else if (psiFile is KtFile) {
-                PsiTreeUtil.getParentOfType(elementAtCaret, KtClass::class.java) ?: psiFile
-            } else {
-                return@runWriteCommandAction
-            }
-            
+            val searchScope =
+                if (psiFile is PsiJavaFile) {
+                    PsiTreeUtil.getParentOfType(elementAtCaret, PsiClass::class.java) ?: psiFile
+                } else if (psiFile is KtFile) {
+                    PsiTreeUtil.getParentOfType(elementAtCaret, KtClass::class.java) ?: psiFile
+                } else {
+                    return@runWriteCommandAction
+                }
+
             inserterService.removeLogs(searchScope, logTag, framework)
         }
     }
@@ -43,7 +44,7 @@ class RemoveLogsAction : AnAction() {
         val project = e.project
         val editor = e.getData(CommonDataKeys.EDITOR)
         val psiFile = e.getData(CommonDataKeys.PSI_FILE)
-        
+
         val isSupportedFile = psiFile is PsiJavaFile || psiFile is KtFile
         e.presentation.isEnabledAndVisible = project != null && editor != null && isSupportedFile
     }

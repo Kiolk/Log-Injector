@@ -6,7 +6,6 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.jetbrains.kotlin.psi.KtFile
 
 class LogInserterServiceTest : BasePlatformTestCase() {
-
     private lateinit var service: LogInserterService
 
     override fun setUp() {
@@ -15,23 +14,25 @@ class LogInserterServiceTest : BasePlatformTestCase() {
     }
 
     fun testInsertKotlinAssignmentLogs() {
-        val before = """
+        val before =
+            """
             fun test() {
                 var x = 1
                 x = 2
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val after = """
+        val after =
+            """
             fun test() {
                 var x = 1
                 x = 2
                 println("TestTag: x assigned new value: ${'$'}{x}")
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
-        
+
         WriteCommandAction.runWriteCommandAction(project) {
             service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.PRINTLN)
         }
@@ -40,16 +41,17 @@ class LogInserterServiceTest : BasePlatformTestCase() {
     }
 
     fun testInsertKotlinAssignmentLogsIdempotency() {
-        val content = """
+        val content =
+            """
             fun test() {
                 var x = 1
                 x = 2
                 println("TestTag: x assigned new value: ${'$'}{x}")
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val psiFile = myFixture.configureByText("Test.kt", content) as KtFile
-        
+
         WriteCommandAction.runWriteCommandAction(project) {
             service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.PRINTLN)
         }
@@ -58,21 +60,23 @@ class LogInserterServiceTest : BasePlatformTestCase() {
     }
 
     fun testInsertKotlinMethodLogs() {
-        val before = """
+        val before =
+            """
             fun test(param: String) {
                 val y = 0
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val after = """
+        val after =
+            """
             fun test(param: String) {
                 println("TestTag: test(param=${'$'}{param})")
                 val y = 0
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
-        
+
         WriteCommandAction.runWriteCommandAction(project) {
             service.insertKotlinMethodLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.PRINTLN)
         }
@@ -81,23 +85,25 @@ class LogInserterServiceTest : BasePlatformTestCase() {
     }
 
     fun testRemoveKotlinLogs() {
-        val before = """
+        val before =
+            """
             fun test() {
                 println("TestTag: some log")
                 var x = 1
                 println("OtherTag: other log")
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val after = """
+        val after =
+            """
             fun test() {
                 var x = 1
                 println("OtherTag: other log")
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
-        
+
         WriteCommandAction.runWriteCommandAction(project) {
             service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.PRINTLN)
         }
@@ -106,25 +112,27 @@ class LogInserterServiceTest : BasePlatformTestCase() {
     }
 
     fun testRemoveJavaLogs() {
-        val before = """
+        val before =
+            """
             public class Test {
                 public void test() {
                     System.out.println("TestTag: log");
                     int x = 1;
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val after = """
+        val after =
+            """
             public class Test {
                 public void test() {
                     int x = 1;
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val psiFile = myFixture.configureByText("Test.java", before)
-        
+
         WriteCommandAction.runWriteCommandAction(project) {
             service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.PRINTLN)
         }
@@ -133,14 +141,16 @@ class LogInserterServiceTest : BasePlatformTestCase() {
     }
 
     fun testInsertKotlinAssignmentTimberLogs() {
-        val before = """
+        val before =
+            """
             fun test() {
                 var x = 1
                 x = 2
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val after = """
+        val after =
+            """
             import timber.log.Timber
 
             fun test() {
@@ -148,10 +158,10 @@ class LogInserterServiceTest : BasePlatformTestCase() {
                 x = 2
                 Timber.tag("TestTag").d("x assigned new value: ${'$'}{x}")
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
-        
+
         WriteCommandAction.runWriteCommandAction(project) {
             service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
         }
@@ -160,23 +170,25 @@ class LogInserterServiceTest : BasePlatformTestCase() {
     }
 
     fun testInsertKotlinMethodTimberLogs() {
-        val before = """
+        val before =
+            """
             fun test(param: String) {
                 val y = 0
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val after = """
+        val after =
+            """
             import timber.log.Timber
 
             fun test(param: String) {
                 Timber.tag("TestTag").d("test(param=${'$'}{param})")
                 val y = 0
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
-        
+
         WriteCommandAction.runWriteCommandAction(project) {
             service.insertKotlinMethodLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
         }
@@ -185,23 +197,25 @@ class LogInserterServiceTest : BasePlatformTestCase() {
     }
 
     fun testRemoveKotlinTimberLogs() {
-        val before = """
+        val before =
+            """
             fun test() {
                 Timber.tag("TestTag").d("some log")
                 var x = 1
                 Timber.tag("OtherTag").d("other log")
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val after = """
+        val after =
+            """
             fun test() {
                 var x = 1
                 Timber.tag("OtherTag").d("other log")
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
-        
+
         WriteCommandAction.runWriteCommandAction(project) {
             service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
         }
@@ -210,25 +224,27 @@ class LogInserterServiceTest : BasePlatformTestCase() {
     }
 
     fun testRemoveJavaTimberLogs() {
-        val before = """
+        val before =
+            """
             public class Test {
                 public void test() {
                     Timber.tag("TestTag").d("log");
                     int x = 1;
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val after = """
+        val after =
+            """
             public class Test {
                 public void test() {
                     int x = 1;
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val psiFile = myFixture.configureByText("Test.java", before)
-        
+
         WriteCommandAction.runWriteCommandAction(project) {
             service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
         }
@@ -237,16 +253,18 @@ class LogInserterServiceTest : BasePlatformTestCase() {
     }
 
     fun testInsertTimberLogsWithImport() {
-        val before = """
+        val before =
+            """
             package com.example
 
             fun test() {
                 var x = 1
                 x = 2
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val after = """
+        val after =
+            """
             package com.example
 
             import timber.log.Timber
@@ -256,10 +274,10 @@ class LogInserterServiceTest : BasePlatformTestCase() {
                 x = 2
                 Timber.tag("TestTag").d("x assigned new value: ${'$'}{x}")
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
-        
+
         WriteCommandAction.runWriteCommandAction(project) {
             service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
         }
@@ -268,7 +286,8 @@ class LogInserterServiceTest : BasePlatformTestCase() {
     }
 
     fun testInsertTimberLogsWithExistingImport() {
-        val content = """
+        val content =
+            """
             package com.example
 
             import timber.log.Timber
@@ -278,10 +297,10 @@ class LogInserterServiceTest : BasePlatformTestCase() {
                 x = 2
                 Timber.tag("TestTag").d("x assigned new value: ${'$'}{x}")
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val psiFile = myFixture.configureByText("Test.kt", content) as KtFile
-        
+
         WriteCommandAction.runWriteCommandAction(project) {
             service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
         }

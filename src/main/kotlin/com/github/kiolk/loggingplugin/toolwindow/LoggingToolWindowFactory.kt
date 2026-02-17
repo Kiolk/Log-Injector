@@ -24,40 +24,47 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
 class LoggingToolWindowFactory : ToolWindowFactory {
-    override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
+    override fun createToolWindowContent(
+        project: Project,
+        toolWindow: ToolWindow,
+    ) {
         val settings = LoggingSettings.getInstance(project)
-        
+
         val mainPanel = JPanel(BorderLayout())
-        
+
         // Top panel for settings
-        val settingsPanel = JPanel(GridBagLayout()).apply {
-            border = JBUI.Borders.empty(10)
-        }
+        val settingsPanel =
+            JPanel(GridBagLayout()).apply {
+                border = JBUI.Borders.empty(10)
+            }
 
-        val constraints = GridBagConstraints().apply {
-            fill = GridBagConstraints.HORIZONTAL
-            weightx = 1.0
-            gridx = 0
-            gridy = 0
-            anchor = GridBagConstraints.WEST
-            insets = JBUI.insets(2)
-        }
+        val constraints =
+            GridBagConstraints().apply {
+                fill = GridBagConstraints.HORIZONTAL
+                weightx = 1.0
+                gridx = 0
+                gridy = 0
+                anchor = GridBagConstraints.WEST
+                insets = JBUI.insets(2)
+            }
 
-        val previewArea = JBTextArea().apply {
-            isEditable = false
-            font = Font("Monospaced", Font.PLAIN, 12)
-            border = BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Preview"),
-                JBUI.Borders.empty(5)
-            )
-        }
+        val previewArea =
+            JBTextArea().apply {
+                isEditable = false
+                font = Font("Monospaced", Font.PLAIN, 12)
+                border =
+                    BorderFactory.createCompoundBorder(
+                        BorderFactory.createTitledBorder("Preview"),
+                        JBUI.Borders.empty(5),
+                    )
+            }
 
         fun updatePreview() {
             val state = settings.state
             val logTag = state.logTag
             val strategy = LogStrategyFactory.getStrategy(state.loggingFramework)
             val preview = StringBuilder()
-            
+
             val ktFactory = org.jetbrains.kotlin.psi.KtPsiFactory(project)
 
             val kotlinImport = strategy.getKotlinImport()
@@ -86,35 +93,52 @@ class LoggingToolWindowFactory : ToolWindowFactory {
         }
 
         val frameworkModel = CollectionComboBoxModel(LoggingSettings.LoggingFramework.entries)
-        val frameworkCombo = ComboBox(frameworkModel).apply {
-            renderer = SimpleListCellRenderer.create("") { it.displayName }
-            selectedItem = settings.state.loggingFramework
-            addActionListener {
-                settings.state.loggingFramework = selectedItem as LoggingSettings.LoggingFramework
-                updatePreview()
+        val frameworkCombo =
+            ComboBox(frameworkModel).apply {
+                renderer = SimpleListCellRenderer.create("") { it.displayName }
+                selectedItem = settings.state.loggingFramework
+                addActionListener {
+                    settings.state.loggingFramework = selectedItem as LoggingSettings.LoggingFramework
+                    updatePreview()
+                }
             }
-        }
 
-        val tagField = JBTextField(settings.state.logTag).apply {
-            document.addDocumentListener(object : DocumentListener {
-                override fun insertUpdate(e: DocumentEvent) { settings.state.logTag = text; updatePreview() }
-                override fun removeUpdate(e: DocumentEvent) { settings.state.logTag = text; updatePreview() }
-                override fun changedUpdate(e: DocumentEvent) { settings.state.logTag = text; updatePreview() }
-            })
-        }
+        val tagField =
+            JBTextField(settings.state.logTag).apply {
+                document.addDocumentListener(
+                    object : DocumentListener {
+                        override fun insertUpdate(e: DocumentEvent) {
+                            settings.state.logTag = text
+                            updatePreview()
+                        }
 
-        val methodExecCheckbox = JBCheckBox("Track Method Execution", settings.state.trackMethodExecution).apply {
-            addActionListener { 
-                settings.state.trackMethodExecution = isSelected
-                updatePreview()
+                        override fun removeUpdate(e: DocumentEvent) {
+                            settings.state.logTag = text
+                            updatePreview()
+                        }
+
+                        override fun changedUpdate(e: DocumentEvent) {
+                            settings.state.logTag = text
+                            updatePreview()
+                        }
+                    },
+                )
             }
-        }
-        val assignmentsCheckbox = JBCheckBox("Track Assignments", settings.state.trackAssignments).apply {
-            addActionListener { 
-                settings.state.trackAssignments = isSelected
-                updatePreview()
+
+        val methodExecCheckbox =
+            JBCheckBox("Track Method Execution", settings.state.trackMethodExecution).apply {
+                addActionListener {
+                    settings.state.trackMethodExecution = isSelected
+                    updatePreview()
+                }
             }
-        }
+        val assignmentsCheckbox =
+            JBCheckBox("Track Assignments", settings.state.trackAssignments).apply {
+                addActionListener {
+                    settings.state.trackAssignments = isSelected
+                    updatePreview()
+                }
+            }
 
         settingsPanel.add(JBLabel("Logging System:"), constraints)
         constraints.gridy++
