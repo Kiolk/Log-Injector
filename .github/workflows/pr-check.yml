@@ -1,0 +1,33 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  check:
+    name: ktlint and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Run Ktlint Check
+        run: ./gradlew ktlintCheck
+
+      - name: Run Unit Tests
+        run: ./gradlew test
+
+      - name: Verify Plugin Build
+        run: ./gradlew buildPlugin verifyPlugin
