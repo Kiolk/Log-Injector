@@ -1,1 +1,1 @@
-rootProject.name = "LoggingPlugin"
+rootProject.name = "LogInjector"

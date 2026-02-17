@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.github.kiolk.loggingplugin</id>
-    <name>Logging Plugin</name>
-    <vendor email="support@example.com" url="https://github.com/kiolk/LoggingPlugin">Yauheni Slizh</vendor>
+    <name>Log Injector</name>
+    <vendor email="tyteishi@gmail.com" url="https://github.com/Kiolk/Log-Injector">Yauheni Slizh</vendor>
 
     <description><![CDATA[
     Automatically inserts and removes "Myfancy log" statements into methods.
@@ -13,6 +13,11 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="LoggingOptions" anchor="right" factoryClass="com.github.kiolk.loggingplugin.toolwindow.LoggingToolWindowFactory" icon="AllIcons.Actions.LogEvents"/>
+        <notificationGroup id="LoggingPluginGroup" displayType="BALLOON" isLogByDefault="true"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <supportsKotlinPluginMode supportsK2="true"/>
     </extensions>
 
     <actions>

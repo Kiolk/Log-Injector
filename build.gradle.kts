@@ -35,7 +35,7 @@ dependencies {
 intellijPlatform {
     pluginConfiguration {
         id = "com.github.kiolk.loggingplugin"
-        name = "Logging Plugin"
+        name = "Log Injector"
         vendor {
             name = "Yauheni Slizh"
         }
