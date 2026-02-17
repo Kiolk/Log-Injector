@@ -4,7 +4,54 @@
     <vendor email="tyteishi@gmail.com" url="https://github.com/Kiolk/Log-Injector">Yauheni Slizh</vendor>
 
     <description><![CDATA[
-    Automatically inserts and removes "Myfancy log" statements into methods.
+    <h2>Log Injector - Boost Your Debugging Workflow</h2>
+    <p>
+        Speed up your debugging process by automatically inserting and removing logging statements in your Java and Kotlin code with just a few clicks.
+        No more manual logging - let Log Injector do the heavy lifting!
+    </p>
+
+    <h3>✨ Key Features</h3>
+    <ul>
+        <li><strong>One-Click Log Insertion:</strong> Automatically add logging statements to all methods in a class</li>
+        <li><strong>Quick Removal:</strong> Remove all inserted logs just as easily</li>
+        <li><strong>Multi-Language Support:</strong> Works seamlessly with both Java and Kotlin files</li>
+        <li><strong>Multiple Frameworks:</strong> Choose between System.out.println or Timber logging</li>
+        <li><strong>Flexible Tracking:</strong> Track method execution and variable assignments</li>
+        <li><strong>Customizable:</strong> Set your own log tags for easy filtering</li>
+    </ul>
+
+    <h3>🚀 How to Use</h3>
+    <ol>
+        <li>Right-click in any Java or Kotlin file</li>
+        <li>Select "Insert Logs" to add logging statements</li>
+        <li>Use "Remove Logs" to clean them up when done</li>
+        <li>Configure options via the LoggingOptions tool window</li>
+    </ol>
+
+    <h3>⚙️ Configuration Options</h3>
+    <ul>
+        <li>Track method execution - Log when methods are called</li>
+        <li>Track assignments - Log variable assignments</li>
+        <li>Custom log tags - Set your preferred log prefix</li>
+        <li>Logging framework - Choose between println and Timber</li>
+    </ul>
+
+    <h3>💡 Perfect For</h3>
+    <ul>
+        <li>Debugging complex method flows</li>
+        <li>Understanding code execution paths</li>
+        <li>Temporary debugging during development</li>
+        <li>Learning how unfamiliar code works</li>
+    </ul>
+
+    <p>
+        <strong>Note:</strong> This plugin is designed for development and debugging purposes.
+        Remember to remove debug logs before committing to production code.
+    </p>
+
+    <p>
+        Found a bug or have a feature request? Visit our <a href="https://github.com/Kiolk/Log-Injector/issues">GitHub repository</a>.
+    </p>
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
