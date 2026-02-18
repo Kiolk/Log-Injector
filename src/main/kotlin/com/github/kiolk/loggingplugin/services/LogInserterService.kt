@@ -219,6 +219,7 @@ class LogInserterService(private val project: Project) {
         val patterns = strategy.getRemovalPatterns(logTag)
 
         if (searchScope.containingFile is PsiJavaFile) {
+            val file = searchScope.containingFile as PsiJavaFile
             val statements =
                 PsiTreeUtil.findChildrenOfType(
                     searchScope,
@@ -226,7 +227,9 @@ class LogInserterService(private val project: Project) {
                 )
             statements.filter { stmt -> patterns.any { stmt.text.contains(it) } }
                 .forEach { it.delete() }
+            removeJavaImportIfUnused(file, strategy.getJavaImport())
         } else if (searchScope.containingFile is KtFile) {
+            val file = searchScope.containingFile as KtFile
             val calls =
                 PsiTreeUtil.findChildrenOfType(
                     searchScope,
@@ -257,7 +260,40 @@ class LogInserterService(private val project: Project) {
                     }
                 }
                 .forEach { it.delete() }
+            removeKotlinImportIfUnused(file, strategy.getKotlinImport())
         }
+    }
+
+    private fun removeKotlinImportIfUnused(
+        file: KtFile,
+        importPath: String?,
+    ) {
+        if (importPath == null) return
+        val className = importPath.substringAfterLast('.')
+        val hasRemainingUsage = file.text
+            .lines()
+            .filter { !it.trimStart().startsWith("import ") }
+            .any { it.contains(className) }
+        if (hasRemainingUsage) return
+        file.importList?.imports
+            ?.find { it.importPath?.pathStr == importPath }
+            ?.delete()
+    }
+
+    private fun removeJavaImportIfUnused(
+        file: PsiJavaFile,
+        importPath: String?,
+    ) {
+        if (importPath == null) return
+        val className = importPath.substringAfterLast('.')
+        val hasRemainingUsage = file.text
+            .lines()
+            .filter { !it.trimStart().startsWith("import ") }
+            .any { it.contains(className) }
+        if (hasRemainingUsage) return
+        file.importList
+            ?.findSingleClassImportStatement(importPath)
+            ?.delete()
     }
 
     private fun isLogAlreadyPresent(

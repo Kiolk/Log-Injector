@@ -281,6 +281,93 @@ class LogInserterServiceTest : BasePlatformTestCase() {
         myFixture.checkResult(after)
     }
 
+    fun testRemoveKotlinTimberLogsAlsoRemovesImport() {
+        val before =
+            """
+            import timber.log.Timber
+
+            fun test() {
+                Timber.tag("TestTag").d("some log")
+                var x = 1
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            fun test() {
+                var x = 1
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testRemoveKotlinTimberLogsKeepsImportWhenOtherTimberLogsRemain() {
+        val before =
+            """
+            import timber.log.Timber
+
+            fun test() {
+                Timber.tag("TestTag").d("some log")
+                Timber.tag("OtherTag").d("other log")
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            import timber.log.Timber
+
+            fun test() {
+                Timber.tag("OtherTag").d("other log")
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testRemoveJavaTimberLogsAlsoRemovesImport() {
+        val before =
+            """
+            import timber.log.Timber;
+
+            public class Test {
+                public void test() {
+                    Timber.tag("TestTag").d("log");
+                    int x = 1;
+                }
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            public class Test {
+                public void test() {
+                    int x = 1;
+                }
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.java", before)
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
     fun testInsertTimberLogsWithImport() {
         val before =
             """
