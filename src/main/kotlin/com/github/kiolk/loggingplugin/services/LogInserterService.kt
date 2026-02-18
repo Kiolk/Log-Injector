@@ -236,15 +236,27 @@ class LogInserterService(private val project: Project) {
             calls.forEach { call ->
                 if (patterns.any { call.text.contains(it) }) {
                     var top: PsiElement = call
-                    while (top.parent is KtDotQualifiedExpression || top.parent is KtSafeQualifiedExpression) {
-                        top = top.parent
+                    while (true) {
+                        val parent = top.parent
+                        if (parent is KtBlockExpression || parent is KtNamedFunction) break
+                        if (parent is KtDotQualifiedExpression || parent is KtSafeQualifiedExpression) {
+                            top = parent
+                        } else {
+                            break
+                        }
                     }
                     if (top.parent is KtBlockExpression || top.parent is KtNamedFunction) {
                         toDelete.add(top)
                     }
                 }
             }
-            toDelete.forEach { it.delete() }
+            toDelete
+                .filter { candidate ->
+                    toDelete.none { other ->
+                        other !== candidate && PsiTreeUtil.isAncestor(candidate, other, true)
+                    }
+                }
+                .forEach { it.delete() }
         }
     }
 

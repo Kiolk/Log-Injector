@@ -223,6 +223,35 @@ class LogInserterServiceTest : BasePlatformTestCase() {
         myFixture.checkResult(after)
     }
 
+    fun testRemoveTimberLogInsideScopeFunctionKeepsBlock() {
+        val before =
+            """
+            fun test() {
+                args.productUUID?.apply {
+                    productUUID = this
+                    Timber.tag("TestTag").d("productUUID assigned new value: ${'$'}{productUUID}")
+                }
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            fun test() {
+                args.productUUID?.apply {
+                    productUUID = this
+                }
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
     fun testRemoveJavaTimberLogs() {
         val before =
             """
