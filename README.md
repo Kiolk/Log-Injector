@@ -14,6 +14,8 @@ An IntelliJ IDEA plugin that automatically inserts and removes logging statement
 - **Multiple Logging Frameworks**:
   - System.out.println (default)
   - Timber (Android logging library)
+  - Napier (Kotlin Multiplatform logging library)
+- **Automatic Import Management**: Imports are added when inserting logs and removed automatically when all logs for a framework are removed
 
 ### 📊 Tracking Options
 - **Method Execution Tracking**: Automatically log method entry points
@@ -68,7 +70,7 @@ Access the plugin settings through the **LoggingOptions** tool window on the rig
 - **Track Method Execution**: Enable/disable method entry logging
 - **Track Assignments**: Enable/disable variable assignment logging
 - **Log Tag**: Set a custom prefix for your log statements (default: "Myfancy log")
-- **Logging Framework**: Choose between System.out.println or Timber
+- **Logging Framework**: Choose between System.out.println, Timber, or Napier
 
 ### Examples
 
@@ -289,6 +291,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Roadmap
 
 Future features under consideration:
+- [x] Napier logging framework support
 - [ ] More logging framework support (Log4j, SLF4J, etc.)
 - [ ] Custom log templates
 - [ ] Smart log placement (avoid duplicates)

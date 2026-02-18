@@ -37,7 +37,8 @@ Debugging complex applications often requires adding temporary logging statement
 
 ### 📦 Multiple Logging Frameworks
 - **System.out.println**: Classic debugging output (default)
-- **Timber**: Popular Android logging library with automatic import management
+- **Timber**: Popular Android logging library — `Timber.tag("Tag").d("message")`
+- **Napier**: Kotlin Multiplatform logging library — `Napier.d("message", tag = "Tag")`
 - **Coming Soon**: Log4j, SLF4J, and custom frameworks
 
 ### ⚙️ Flexible Configuration
@@ -176,9 +177,10 @@ Access via **LoggingOptions** tool window:
 - **Platforms**: Windows, macOS, Linux
 
 ### Smart Features
-- **Import Management**: Automatically adds necessary imports (e.g., Timber)
+- **Import Management**: Automatically adds imports on insertion and removes them when no logs remain (Timber, Napier)
 - **Scope Detection**: Works on current class or entire file
-- **Safe Removal**: Only removes logs inserted by this plugin
+- **Safe Removal**: Only removes logs inserted by this plugin, preserving logs from other tags
+- **Scope Function Awareness**: When removing a log inside an `apply`/`let`/`run` block, only the log line is removed — the block is preserved
 - **PSI-Based**: Uses IntelliJ's powerful PSI (Program Structure Interface)
 
 ### Performance
@@ -204,7 +206,8 @@ Access via **LoggingOptions** tool window:
 - Use keyboard shortcuts for faster workflow
 
 ### Tip 4: Framework-Specific Benefits
-- **Timber**: Automatically adds imports and uses proper Timber API
+- **Timber**: Automatically adds/removes `import timber.log.Timber`, uses `Timber.tag("Tag").d("message")`
+- **Napier**: Automatically adds/removes `import io.github.aakira.napier.Napier`, uses `Napier.d("message", tag = "Tag")` — ideal for Kotlin Multiplatform projects
 - **println**: Simple and works everywhere, no dependencies
 
 ---
@@ -225,6 +228,7 @@ Access via **LoggingOptions** tool window:
 
 ### Coming Soon
 - ✨ Support for Log4j and SLF4J
+- ✨ More Kotlin Multiplatform framework integrations
 - ✨ Custom log templates
 - ✨ Log level configuration (DEBUG, INFO, WARN, ERROR)
 - ✨ Smart duplicate detection

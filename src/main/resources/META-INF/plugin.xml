@@ -15,7 +15,7 @@
         <li><strong>One-Click Log Insertion:</strong> Automatically add logging statements to all methods in a class</li>
         <li><strong>Quick Removal:</strong> Remove all inserted logs just as easily</li>
         <li><strong>Multi-Language Support:</strong> Works seamlessly with both Java and Kotlin files</li>
-        <li><strong>Multiple Frameworks:</strong> Choose between System.out.println or Timber logging</li>
+        <li><strong>Multiple Frameworks:</strong> Choose between System.out.println, Timber, or Napier logging</li>
         <li><strong>Flexible Tracking:</strong> Track method execution and variable assignments</li>
         <li><strong>Customizable:</strong> Set your own log tags for easy filtering</li>
     </ul>
@@ -33,7 +33,8 @@
         <li>Track method execution - Log when methods are called</li>
         <li>Track assignments - Log variable assignments</li>
         <li>Custom log tags - Set your preferred log prefix</li>
-        <li>Logging framework - Choose between println and Timber</li>
+        <li>Logging framework - Choose between println, Timber, and Napier</li>
+        <li>Automatic import management - Imports are added on insertion and removed when no longer needed</li>
     </ul>
 
     <h3>💡 Perfect For</h3>
