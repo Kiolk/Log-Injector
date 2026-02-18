@@ -53,19 +53,23 @@ intellijPlatform {
     }
 
     signing {
-        val cert =
-            providers.environmentVariable("CERTIFICATE_CHAIN")
-                .orElse(providers.gradleProperty("certificateChain"))
-                .map { it.replace("\\n", "\n") }
+        val cert = providers.environmentVariable("CERTIFICATE_CHAIN")
+            .orElse(providers.gradleProperty("certificateChain"))
+            .orNull?.replace("\\n", "\n")
 
-        val key =
-            providers.environmentVariable("PRIVATE_KEY")
-                .orElse(providers.gradleProperty("privateKey"))
-                .map { it.replace("\\n", "\n") }
+        val key = providers.environmentVariable("PRIVATE_KEY")
+            .orElse(providers.gradleProperty("privateKey"))
+            .orNull?.replace("\\n", "\n")
 
-        certificateChain.set(cert)
-        privateKey.set(key)
-        password.set(providers.environmentVariable("PRIVATE_KEY_PASSWORD").orElse(providers.gradleProperty("privateKeyPassword")))
+        val keyPassword = providers.environmentVariable("PRIVATE_KEY_PASSWORD")
+            .orElse(providers.gradleProperty("privateKeyPassword"))
+            .orNull
+
+        if (cert != null && key != null && keyPassword != null) {
+            certificateChain.set(cert)
+            privateKey.set(key)
+            password.set(keyPassword)
+        }
     }
 
     publishing {
