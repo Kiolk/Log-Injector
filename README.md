@@ -1,6 +1,6 @@
 # Log Injector for IntelliJ IDEA
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/Kiolk/Log-Injector)
+[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/Kiolk/Log-Injector)
 [![IntelliJ Platform](https://img.shields.io/badge/IntelliJ-2024.3-orange.svg)](https://www.jetbrains.com/idea/)
 
 An IntelliJ IDEA plugin that automatically inserts and removes logging statements in your Java and Kotlin code. Save time and improve debugging efficiency by adding comprehensive logging with just a few clicks.

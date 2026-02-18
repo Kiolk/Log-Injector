@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-02-19
+
+### Fixed
+- Fixed incorrect removal of entire scope function blocks (`apply`, `let`, `run`) when removing a single log line inside them
+
+### Improved
+- Added Napier logging framework support for Kotlin Multiplatform projects
+- Minor stability improvements
+
 ### Planned Features
 - Support for additional logging frameworks (Log4j, SLF4J)
 - Custom log templates

@@ -270,10 +270,11 @@ class LogInserterService(private val project: Project) {
     ) {
         if (importPath == null) return
         val className = importPath.substringAfterLast('.')
-        val hasRemainingUsage = file.text
-            .lines()
-            .filter { !it.trimStart().startsWith("import ") }
-            .any { it.contains(className) }
+        val hasRemainingUsage =
+            file.text
+                .lines()
+                .filter { !it.trimStart().startsWith("import ") }
+                .any { it.contains(className) }
         if (hasRemainingUsage) return
         file.importList?.imports
             ?.find { it.importPath?.pathStr == importPath }
@@ -286,10 +287,11 @@ class LogInserterService(private val project: Project) {
     ) {
         if (importPath == null) return
         val className = importPath.substringAfterLast('.')
-        val hasRemainingUsage = file.text
-            .lines()
-            .filter { !it.trimStart().startsWith("import ") }
-            .any { it.contains(className) }
+        val hasRemainingUsage =
+            file.text
+                .lines()
+                .filter { !it.trimStart().startsWith("import ") }
+                .any { it.contains(className) }
         if (hasRemainingUsage) return
         file.importList
             ?.findSingleClassImportStatement(importPath)
