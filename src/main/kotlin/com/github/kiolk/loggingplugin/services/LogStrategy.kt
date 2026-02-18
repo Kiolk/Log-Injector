@@ -64,11 +64,32 @@ class TimberStrategy : LogStrategy {
     override fun getJavaImport(): String = "timber.log.Timber"
 }
 
+class NapierStrategy : LogStrategy {
+    override fun createKotlinLog(
+        factory: KtPsiFactory,
+        tag: String,
+        message: String,
+    ): String = "Napier.d(\"$message\", tag = \"$tag\")"
+
+    override fun createJavaLog(
+        factory: PsiElementFactory,
+        tag: String,
+        message: String,
+    ): String = "Napier.d(\"$message\", tag = \"$tag\");"
+
+    override fun getRemovalPatterns(tag: String): List<String> = listOf("tag = \"$tag\"", tag)
+
+    override fun getKotlinImport(): String = "io.github.aakira.napier.Napier"
+
+    override fun getJavaImport(): String? = null
+}
+
 object LogStrategyFactory {
     fun getStrategy(framework: LoggingSettings.LoggingFramework): LogStrategy {
         return when (framework) {
             LoggingSettings.LoggingFramework.PRINTLN -> PrintlnStrategy()
             LoggingSettings.LoggingFramework.TIMBER -> TimberStrategy()
+            LoggingSettings.LoggingFramework.NAPIER -> NapierStrategy()
         }
     }
 }

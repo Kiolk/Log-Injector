@@ -13,6 +13,7 @@ class LoggingSettings : PersistentStateComponent<LoggingSettings.State> {
     enum class LoggingFramework(val displayName: String) {
         PRINTLN("System Println"),
         TIMBER("Timber"),
+        NAPIER("Napier"),
     }
 
     data class State(

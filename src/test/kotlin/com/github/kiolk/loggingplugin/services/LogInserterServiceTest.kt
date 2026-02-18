@@ -368,6 +368,230 @@ class LogInserterServiceTest : BasePlatformTestCase() {
         myFixture.checkResult(after)
     }
 
+    fun testInsertKotlinAssignmentNapierLogs() {
+        val before =
+            """
+            fun test() {
+                var x = 1
+                x = 2
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            import io.github.aakira.napier.Napier
+
+            fun test() {
+                var x = 1
+                x = 2
+                Napier.d("x assigned new value: ${'$'}{x}", tag = "TestTag")
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.NAPIER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testInsertKotlinMethodNapierLogs() {
+        val before =
+            """
+            fun test(param: String) {
+                val y = 0
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            import io.github.aakira.napier.Napier
+
+            fun test(param: String) {
+                Napier.d("test(param=${'$'}{param})", tag = "TestTag")
+                val y = 0
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.insertKotlinMethodLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.NAPIER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testInsertNapierLogsWithImport() {
+        val before =
+            """
+            package com.example
+
+            fun test() {
+                var x = 1
+                x = 2
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            package com.example
+
+            import io.github.aakira.napier.Napier
+
+            fun test() {
+                var x = 1
+                x = 2
+                Napier.d("x assigned new value: ${'$'}{x}", tag = "TestTag")
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.NAPIER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testInsertNapierLogsWithExistingImport() {
+        val content =
+            """
+            package com.example
+
+            import io.github.aakira.napier.Napier
+
+            fun test() {
+                var x = 1
+                x = 2
+                Napier.d("x assigned new value: ${'$'}{x}", tag = "TestTag")
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", content) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.NAPIER)
+        }
+
+        myFixture.checkResult(content)
+    }
+
+    fun testRemoveKotlinNapierLogs() {
+        val before =
+            """
+            fun test() {
+                Napier.d("some log", tag = "TestTag")
+                var x = 1
+                Napier.d("other log", tag = "OtherTag")
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            fun test() {
+                var x = 1
+                Napier.d("other log", tag = "OtherTag")
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.NAPIER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testRemoveNapierLogInsideScopeFunctionKeepsBlock() {
+        val before =
+            """
+            fun test() {
+                args.productUUID?.apply {
+                    productUUID = this
+                    Napier.d("productUUID assigned new value: ${'$'}{productUUID}", tag = "TestTag")
+                }
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            fun test() {
+                args.productUUID?.apply {
+                    productUUID = this
+                }
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.NAPIER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testRemoveKotlinNapierLogsAlsoRemovesImport() {
+        val before =
+            """
+            import io.github.aakira.napier.Napier
+
+            fun test() {
+                Napier.d("some log", tag = "TestTag")
+                var x = 1
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            fun test() {
+                var x = 1
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.NAPIER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testRemoveKotlinNapierLogsKeepsImportWhenOtherNapierLogsRemain() {
+        val before =
+            """
+            import io.github.aakira.napier.Napier
+
+            fun test() {
+                Napier.d("some log", tag = "TestTag")
+                Napier.d("other log", tag = "OtherTag")
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            import io.github.aakira.napier.Napier
+
+            fun test() {
+                Napier.d("other log", tag = "OtherTag")
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.NAPIER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
     fun testInsertTimberLogsWithImport() {
         val before =
             """
