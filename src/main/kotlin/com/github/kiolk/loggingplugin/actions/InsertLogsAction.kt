@@ -7,12 +7,14 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.command.WriteCommandAction
-import com.intellij.psi.*
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.util.PsiTreeUtil
-import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtFile
 
 class InsertLogsAction : AnAction() {
-
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -35,7 +37,7 @@ class InsertLogsAction : AnAction() {
         psiFile: PsiJavaFile,
         elementAtCaret: PsiElement?,
         settings: LoggingSettings.State,
-        inserterService: LogInserterService
+        inserterService: LogInserterService,
     ) {
         val targetClass = PsiTreeUtil.getParentOfType(elementAtCaret, PsiClass::class.java)
         val searchScope = targetClass ?: psiFile
@@ -54,7 +56,7 @@ class InsertLogsAction : AnAction() {
         psiFile: KtFile,
         elementAtCaret: PsiElement?,
         settings: LoggingSettings.State,
-        inserterService: LogInserterService
+        inserterService: LogInserterService,
     ) {
         val targetClass = PsiTreeUtil.getParentOfType(elementAtCaret, KtClass::class.java)
         val searchScope = targetClass ?: psiFile

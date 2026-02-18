@@ -7,7 +7,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
 }
 
-version = "1.0.0"
+version = "1.0.1"
 group = "com.github.kiolk.loggingplugin"
 
 repositories {
@@ -23,6 +23,7 @@ dependencies {
         bundledPlugin("com.intellij.java")
         bundledPlugin("org.jetbrains.kotlin")
         instrumentationTools()
+        pluginVerifier()
         testFramework(TestFrameworkType.Platform)
         zipSigner()
     }
@@ -42,6 +43,12 @@ intellijPlatform {
         ideaVersion {
             sinceBuild = "243"
             untilBuild = "253.*"
+        }
+    }
+
+    pluginVerification {
+        ides {
+            ide("2024.3")
         }
     }
 
@@ -67,9 +74,10 @@ intellijPlatform {
     }
 }
 
-kotlin {
-    jvmToolchain(21)
-}
+// Kotlin JVM toolchain is automatically configured by IntelliJ Platform Plugin
+// kotlin {
+//     jvmToolchain(21)
+// }
 
 ktlint {
     // Correcting property names if they were causing errors
