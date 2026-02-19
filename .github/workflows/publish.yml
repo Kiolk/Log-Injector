@@ -4,9 +4,7 @@ on:
   push:
     branches:
       - main
-  release:
-    types: [created]
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -21,20 +19,20 @@ jobs:
         with:
           java-version: '21'
           distribution: 'zulu'
+          cache: 'gradle'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-      - name: Build Plugin
-        run: ./gradlew buildPlugin
+      - name: Prepare Signing Files
+        run: |
+          echo "${{ secrets.CERTIFICATE_CHAIN }}" > certificateChain.pem
+          echo "${{ secrets.PRIVATE_KEY }}" > privateKey.pem
 
-      - name: Verify Plugin
-        run: ./gradlew verifyPlugin
-
-      - name: Publish Plugin
+      - name: Build and Publish
         env:
-          CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-          PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
           PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+          PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
+          CERTIFICATE_CHAIN_PATH: ${{ github.workspace }}/certificateChain.pem
+          PRIVATE_KEY_PATH: ${{ github.workspace }}/privateKey.pem
         run: ./gradlew publishPlugin
