@@ -14,6 +14,7 @@ class LoggingSettings : PersistentStateComponent<LoggingSettings.State> {
         PRINTLN("System Println"),
         TIMBER("Timber"),
         NAPIER("Napier"),
+        CUSTOM("Custom"),
     }
 
     data class State(
@@ -21,6 +22,9 @@ class LoggingSettings : PersistentStateComponent<LoggingSettings.State> {
         var trackAssignments: Boolean = true,
         var logTag: String = "Myfancy log",
         var loggingFramework: LoggingFramework = LoggingFramework.PRINTLN,
+        var customKotlinTemplate: String = "Log.d(\"{tag}\", \"{message}\")",
+        var customJavaTemplate: String = "Log.d(\"{tag}\", \"{message}\");",
+        var customImport: String = "",
     )
 
     private var myState = State()
