@@ -1,6 +1,6 @@
 # Log Injector for IntelliJ IDEA
 
-[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/Kiolk/Log-Injector)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/Kiolk/Log-Injector)
 [![IntelliJ Platform](https://img.shields.io/badge/IntelliJ-2024.3-orange.svg)](https://www.jetbrains.com/idea/)
 
 An IntelliJ IDEA plugin that automatically inserts and removes logging statements in your Java and Kotlin code. Save time and improve debugging efficiency by adding comprehensive logging with just a few clicks.
@@ -13,8 +13,10 @@ An IntelliJ IDEA plugin that automatically inserts and removes logging statement
 - **Multi-Language Support**: Works with both Java and Kotlin files
 - **Multiple Logging Frameworks**:
   - System.out.println (default)
+  - Android Log (`Log.d` from `android.util.Log`)
   - Timber (Android logging library)
   - Napier (Kotlin Multiplatform logging library)
+  - Custom (user-defined templates with `{tag}` and `{message}` placeholders)
 - **Automatic Import Management**: Imports are added when inserting logs and removed automatically when all logs for a framework are removed
 
 ### 📊 Tracking Options
@@ -70,7 +72,7 @@ Access the plugin settings through the **LoggingOptions** tool window on the rig
 - **Track Method Execution**: Enable/disable method entry logging
 - **Track Assignments**: Enable/disable variable assignment logging
 - **Log Tag**: Set a custom prefix for your log statements (default: "Myfancy log")
-- **Logging Framework**: Choose between System.out.println, Timber, or Napier
+- **Logging Framework**: Choose between System.out.println, Android Log, Timber, Napier, or Custom
 
 ### Examples
 
@@ -279,7 +281,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Changelog
 
-### Version 1.0.0 (Current)
+### Version 1.1.0 (Current)
+- Android Log support (`android.util.Log`)
+- Custom logging framework support with user-defined templates
+- Custom template UI in the tool window
+
+### Version 1.0.1
+- Napier logging framework support
+- Scope function block removal fix
+
+### Version 1.0.0
 - Initial release
 - Support for Java and Kotlin
 - Method execution tracking
@@ -292,8 +303,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Future features under consideration:
 - [x] Napier logging framework support
+- [x] Android Log support
+- [x] Custom log templates
 - [ ] More logging framework support (Log4j, SLF4J, etc.)
-- [ ] Custom log templates
 - [ ] Smart log placement (avoid duplicates)
 - [ ] Log level configuration
 - [ ] Bulk operations across multiple files

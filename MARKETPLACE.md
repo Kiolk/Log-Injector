@@ -37,9 +37,10 @@ Debugging complex applications often requires adding temporary logging statement
 
 ### 📦 Multiple Logging Frameworks
 - **System.out.println**: Classic debugging output (default)
+- **Android Log**: Native Android logging — `Log.d("Tag", "message")`
 - **Timber**: Popular Android logging library — `Timber.tag("Tag").d("message")`
 - **Napier**: Kotlin Multiplatform logging library — `Napier.d("message", tag = "Tag")`
-- **Coming Soon**: Log4j, SLF4J, and custom frameworks
+- **Custom**: Define your own templates with `{tag}` and `{message}` placeholders
 
 ### ⚙️ Flexible Configuration
 - **Method Execution Tracking**: Log when methods are called
@@ -165,6 +166,7 @@ Access via **LoggingOptions** tool window:
 | **Track Assignments** | Log variable assignments | ✅ Enabled |
 | **Log Tag** | Custom prefix for logs | "Myfancy log" |
 | **Logging Framework** | Choose output method | System.out.println |
+| **Custom Templates** | Define your own log format (when Custom is selected) | `Log.d("{tag}", "{message}")` |
 
 ---
 
@@ -177,7 +179,7 @@ Access via **LoggingOptions** tool window:
 - **Platforms**: Windows, macOS, Linux
 
 ### Smart Features
-- **Import Management**: Automatically adds imports on insertion and removes them when no logs remain (Timber, Napier)
+- **Import Management**: Automatically adds imports on insertion and removes them when no logs remain (Android Log, Timber, Napier, Custom)
 - **Scope Detection**: Works on current class or entire file
 - **Safe Removal**: Only removes logs inserted by this plugin, preserving logs from other tags
 - **Scope Function Awareness**: When removing a log inside an `apply`/`let`/`run` block, only the log line is removed — the block is preserved
@@ -206,8 +208,10 @@ Access via **LoggingOptions** tool window:
 - Use keyboard shortcuts for faster workflow
 
 ### Tip 4: Framework-Specific Benefits
+- **Android Log**: Automatically adds/removes `import android.util.Log`, uses `Log.d("Tag", "message")` — native Android logging
 - **Timber**: Automatically adds/removes `import timber.log.Timber`, uses `Timber.tag("Tag").d("message")`
 - **Napier**: Automatically adds/removes `import io.github.aakira.napier.Napier`, uses `Napier.d("message", tag = "Tag")` — ideal for Kotlin Multiplatform projects
+- **Custom**: Define your own log format with `{tag}` and `{message}` placeholders, with an optional import path
 - **println**: Simple and works everywhere, no dependencies
 
 ---
@@ -229,7 +233,6 @@ Access via **LoggingOptions** tool window:
 ### Coming Soon
 - ✨ Support for Log4j and SLF4J
 - ✨ More Kotlin Multiplatform framework integrations
-- ✨ Custom log templates
 - ✨ Log level configuration (DEBUG, INFO, WARN, ERROR)
 - ✨ Smart duplicate detection
 - ✨ Bulk operations across multiple files

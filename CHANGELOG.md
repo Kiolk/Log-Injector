@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-04-08
+
+### Added
+- Android Log support (`Log.d(tag, message)` from `android.util.Log`) as a built-in logging framework
+- Custom logging framework support with user-defined templates using `{tag}` and `{message}` placeholders
+- Custom template UI fields in the tool window (Kotlin template, Java template, optional import path)
+- Java import fallback for unresolvable classes (needed for custom framework imports)
+
 ## [1.0.1] - 2026-02-19
 
 ### Fixed
