@@ -97,9 +97,20 @@ class LoggingToolWindowFactory : ToolWindowFactory {
             JBTextField(settings.state.customKotlinTemplate).apply {
                 document.addDocumentListener(
                     object : DocumentListener {
-                        override fun insertUpdate(e: DocumentEvent) { settings.state.customKotlinTemplate = text; updatePreview() }
-                        override fun removeUpdate(e: DocumentEvent) { settings.state.customKotlinTemplate = text; updatePreview() }
-                        override fun changedUpdate(e: DocumentEvent) { settings.state.customKotlinTemplate = text; updatePreview() }
+                        override fun insertUpdate(e: DocumentEvent) {
+                            settings.state.customKotlinTemplate = text
+                            updatePreview()
+                        }
+
+                        override fun removeUpdate(e: DocumentEvent) {
+                            settings.state.customKotlinTemplate = text
+                            updatePreview()
+                        }
+
+                        override fun changedUpdate(e: DocumentEvent) {
+                            settings.state.customKotlinTemplate = text
+                            updatePreview()
+                        }
                     },
                 )
             }
@@ -109,9 +120,20 @@ class LoggingToolWindowFactory : ToolWindowFactory {
             JBTextField(settings.state.customJavaTemplate).apply {
                 document.addDocumentListener(
                     object : DocumentListener {
-                        override fun insertUpdate(e: DocumentEvent) { settings.state.customJavaTemplate = text; updatePreview() }
-                        override fun removeUpdate(e: DocumentEvent) { settings.state.customJavaTemplate = text; updatePreview() }
-                        override fun changedUpdate(e: DocumentEvent) { settings.state.customJavaTemplate = text; updatePreview() }
+                        override fun insertUpdate(e: DocumentEvent) {
+                            settings.state.customJavaTemplate = text
+                            updatePreview()
+                        }
+
+                        override fun removeUpdate(e: DocumentEvent) {
+                            settings.state.customJavaTemplate = text
+                            updatePreview()
+                        }
+
+                        override fun changedUpdate(e: DocumentEvent) {
+                            settings.state.customJavaTemplate = text
+                            updatePreview()
+                        }
                     },
                 )
             }
@@ -121,9 +143,20 @@ class LoggingToolWindowFactory : ToolWindowFactory {
             JBTextField(settings.state.customImport).apply {
                 document.addDocumentListener(
                     object : DocumentListener {
-                        override fun insertUpdate(e: DocumentEvent) { settings.state.customImport = text; updatePreview() }
-                        override fun removeUpdate(e: DocumentEvent) { settings.state.customImport = text; updatePreview() }
-                        override fun changedUpdate(e: DocumentEvent) { settings.state.customImport = text; updatePreview() }
+                        override fun insertUpdate(e: DocumentEvent) {
+                            settings.state.customImport = text
+                            updatePreview()
+                        }
+
+                        override fun removeUpdate(e: DocumentEvent) {
+                            settings.state.customImport = text
+                            updatePreview()
+                        }
+
+                        override fun changedUpdate(e: DocumentEvent) {
+                            settings.state.customImport = text
+                            updatePreview()
+                        }
                     },
                 )
             }

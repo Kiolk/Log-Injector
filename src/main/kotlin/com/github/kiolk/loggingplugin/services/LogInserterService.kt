@@ -211,7 +211,12 @@ class LogInserterService(private val project: Project) {
             val importStatement = factory.createImportStatement(psiClass)
             importList.add(importStatement)
         } else {
-            val tempFile = PsiFileFactory.getInstance(project).createFileFromText("Dummy.java", com.intellij.lang.java.JavaLanguage.INSTANCE, "import $importPath;\nclass Dummy {}") as PsiJavaFile
+            val tempFile =
+                PsiFileFactory.getInstance(project).createFileFromText(
+                    "Dummy.java",
+                    com.intellij.lang.java.JavaLanguage.INSTANCE,
+                    "import $importPath;\nclass Dummy {}",
+                ) as PsiJavaFile
             val importStatement = tempFile.importList?.allImportStatements?.firstOrNull() ?: return
             importList.add(importStatement)
         }

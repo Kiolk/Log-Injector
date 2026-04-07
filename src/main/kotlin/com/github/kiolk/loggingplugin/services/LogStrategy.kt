@@ -126,11 +126,12 @@ object LogStrategyFactory {
             LoggingSettings.LoggingFramework.PRINTLN -> PrintlnStrategy()
             LoggingSettings.LoggingFramework.TIMBER -> TimberStrategy()
             LoggingSettings.LoggingFramework.NAPIER -> NapierStrategy()
-            LoggingSettings.LoggingFramework.CUSTOM -> CustomLogStrategy(
-                state?.customKotlinTemplate ?: "Log.d(\"{tag}\", \"{message}\")",
-                state?.customJavaTemplate ?: "Log.d(\"{tag}\", \"{message}\");",
-                state?.customImport,
-            )
+            LoggingSettings.LoggingFramework.CUSTOM ->
+                CustomLogStrategy(
+                    state?.customKotlinTemplate ?: "Log.d(\"{tag}\", \"{message}\")",
+                    state?.customJavaTemplate ?: "Log.d(\"{tag}\", \"{message}\");",
+                    state?.customImport,
+                )
         }
     }
 }
