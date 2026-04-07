@@ -12,6 +12,7 @@ import com.intellij.openapi.project.Project
 class LoggingSettings : PersistentStateComponent<LoggingSettings.State> {
     enum class LoggingFramework(val displayName: String) {
         PRINTLN("System Println"),
+        ANDROID_LOG("Android Log"),
         TIMBER("Timber"),
         NAPIER("Napier"),
         CUSTOM("Custom"),

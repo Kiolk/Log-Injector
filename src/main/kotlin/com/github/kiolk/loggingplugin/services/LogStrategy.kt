@@ -44,6 +44,26 @@ class PrintlnStrategy : LogStrategy {
     override fun getJavaImport(): String? = null
 }
 
+class AndroidLogStrategy : LogStrategy {
+    override fun createKotlinLog(
+        factory: KtPsiFactory,
+        tag: String,
+        message: String,
+    ): String = "Log.d(\"$tag\", \"$message\")"
+
+    override fun createJavaLog(
+        factory: PsiElementFactory,
+        tag: String,
+        message: String,
+    ): String = "Log.d(\"$tag\", \"$message\");"
+
+    override fun getRemovalPatterns(tag: String): List<String> = listOf("Log.d(\"$tag\"", tag)
+
+    override fun getKotlinImport(): String = "android.util.Log"
+
+    override fun getJavaImport(): String = "android.util.Log"
+}
+
 class TimberStrategy : LogStrategy {
     override fun createKotlinLog(
         factory: KtPsiFactory,
@@ -124,6 +144,7 @@ object LogStrategyFactory {
     ): LogStrategy {
         return when (framework) {
             LoggingSettings.LoggingFramework.PRINTLN -> PrintlnStrategy()
+            LoggingSettings.LoggingFramework.ANDROID_LOG -> AndroidLogStrategy()
             LoggingSettings.LoggingFramework.TIMBER -> TimberStrategy()
             LoggingSettings.LoggingFramework.NAPIER -> NapierStrategy()
             LoggingSettings.LoggingFramework.CUSTOM ->

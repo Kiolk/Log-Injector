@@ -140,6 +140,257 @@ class LogInserterServiceTest : BasePlatformTestCase() {
         myFixture.checkResult(after)
     }
 
+    fun testInsertKotlinAssignmentAndroidLogLogs() {
+        val before =
+            """
+            fun test() {
+                var x = 1
+                x = 2
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            import android.util.Log
+
+            fun test() {
+                var x = 1
+                x = 2
+                Log.d("TestTag", "x assigned new value: ${'$'}{x}")
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.ANDROID_LOG)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testInsertKotlinMethodAndroidLogLogs() {
+        val before =
+            """
+            fun test(param: String) {
+                val y = 0
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            import android.util.Log
+
+            fun test(param: String) {
+                Log.d("TestTag", "test(param=${'$'}{param})")
+                val y = 0
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.insertKotlinMethodLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.ANDROID_LOG)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testRemoveKotlinAndroidLogLogs() {
+        val before =
+            """
+            fun test() {
+                Log.d("TestTag", "some log")
+                var x = 1
+                Log.d("OtherTag", "other log")
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            fun test() {
+                var x = 1
+                Log.d("OtherTag", "other log")
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.ANDROID_LOG)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testRemoveAndroidLogInsideScopeFunctionKeepsBlock() {
+        val before =
+            """
+            fun test() {
+                args.productUUID?.apply {
+                    productUUID = this
+                    Log.d("TestTag", "productUUID assigned new value: ${'$'}{productUUID}")
+                }
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            fun test() {
+                args.productUUID?.apply {
+                    productUUID = this
+                }
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.ANDROID_LOG)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testRemoveKotlinAndroidLogLogsAlsoRemovesImport() {
+        val before =
+            """
+            import android.util.Log
+
+            fun test() {
+                Log.d("TestTag", "some log")
+                var x = 1
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            fun test() {
+                var x = 1
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.ANDROID_LOG)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testRemoveKotlinAndroidLogLogsRemovesImportWhenClassNameAppearsAsSubstring() {
+        val before =
+            """
+            import android.util.Log
+
+            fun test() {
+                Log.d("TestTag", "some log")
+                val logging = "Logger"
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            fun test() {
+                val logging = "Logger"
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.ANDROID_LOG)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testRemoveKotlinAndroidLogLogsKeepsImportWhenOtherLogsRemain() {
+        val before =
+            """
+            import android.util.Log
+
+            fun test() {
+                Log.d("TestTag", "some log")
+                Log.d("OtherTag", "other log")
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            import android.util.Log
+
+            fun test() {
+                Log.d("OtherTag", "other log")
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.ANDROID_LOG)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testInsertAndroidLogLogsWithImport() {
+        val before =
+            """
+            package com.example
+
+            fun test() {
+                var x = 1
+                x = 2
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            package com.example
+
+            import android.util.Log
+
+            fun test() {
+                var x = 1
+                x = 2
+                Log.d("TestTag", "x assigned new value: ${'$'}{x}")
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.ANDROID_LOG)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testInsertAndroidLogLogsWithExistingImport() {
+        val content =
+            """
+            package com.example
+
+            import android.util.Log
+
+            fun test() {
+                var x = 1
+                x = 2
+                Log.d("TestTag", "x assigned new value: ${'$'}{x}")
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", content) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.insertKotlinAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.ANDROID_LOG)
+        }
+
+        myFixture.checkResult(content)
+    }
+
     fun testInsertKotlinAssignmentTimberLogs() {
         val before =
             """
