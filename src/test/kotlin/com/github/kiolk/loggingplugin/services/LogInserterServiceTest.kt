@@ -279,6 +279,33 @@ class LogInserterServiceTest : BasePlatformTestCase() {
         myFixture.checkResult(after)
     }
 
+    fun testRemoveKotlinAndroidLogLogsRemovesImportWhenClassNameAppearsAsSubstring() {
+        val before =
+            """
+            import android.util.Log
+
+            fun test() {
+                Log.d("TestTag", "some log")
+                val logging = "Logger"
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            fun test() {
+                val logging = "Logger"
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.kt", before) as KtFile
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.removeLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.ANDROID_LOG)
+        }
+
+        myFixture.checkResult(after)
+    }
+
     fun testRemoveKotlinAndroidLogLogsKeepsImportWhenOtherLogsRemain() {
         val before =
             """
