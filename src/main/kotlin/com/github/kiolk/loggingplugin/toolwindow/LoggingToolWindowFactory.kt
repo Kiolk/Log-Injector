@@ -62,7 +62,7 @@ class LoggingToolWindowFactory : ToolWindowFactory {
         fun updatePreview() {
             val state = settings.state
             val logTag = state.logTag
-            val strategy = LogStrategyFactory.getStrategy(state.loggingFramework)
+            val strategy = LogStrategyFactory.getStrategy(state.loggingFramework, state)
             val preview = StringBuilder()
 
             val ktFactory = org.jetbrains.kotlin.psi.KtPsiFactory(project)
@@ -92,13 +92,94 @@ class LoggingToolWindowFactory : ToolWindowFactory {
             previewArea.text = preview.toString()
         }
 
+        val customKotlinTemplateLabel = JBLabel("Kotlin Template ({tag}, {message}):")
+        val customKotlinTemplateField =
+            JBTextField(settings.state.customKotlinTemplate).apply {
+                document.addDocumentListener(
+                    object : DocumentListener {
+                        override fun insertUpdate(e: DocumentEvent) {
+                            settings.state.customKotlinTemplate = text
+                            updatePreview()
+                        }
+
+                        override fun removeUpdate(e: DocumentEvent) {
+                            settings.state.customKotlinTemplate = text
+                            updatePreview()
+                        }
+
+                        override fun changedUpdate(e: DocumentEvent) {
+                            settings.state.customKotlinTemplate = text
+                            updatePreview()
+                        }
+                    },
+                )
+            }
+
+        val customJavaTemplateLabel = JBLabel("Java Template ({tag}, {message}):")
+        val customJavaTemplateField =
+            JBTextField(settings.state.customJavaTemplate).apply {
+                document.addDocumentListener(
+                    object : DocumentListener {
+                        override fun insertUpdate(e: DocumentEvent) {
+                            settings.state.customJavaTemplate = text
+                            updatePreview()
+                        }
+
+                        override fun removeUpdate(e: DocumentEvent) {
+                            settings.state.customJavaTemplate = text
+                            updatePreview()
+                        }
+
+                        override fun changedUpdate(e: DocumentEvent) {
+                            settings.state.customJavaTemplate = text
+                            updatePreview()
+                        }
+                    },
+                )
+            }
+
+        val customImportLabel = JBLabel("Import (optional):")
+        val customImportField =
+            JBTextField(settings.state.customImport).apply {
+                document.addDocumentListener(
+                    object : DocumentListener {
+                        override fun insertUpdate(e: DocumentEvent) {
+                            settings.state.customImport = text
+                            updatePreview()
+                        }
+
+                        override fun removeUpdate(e: DocumentEvent) {
+                            settings.state.customImport = text
+                            updatePreview()
+                        }
+
+                        override fun changedUpdate(e: DocumentEvent) {
+                            settings.state.customImport = text
+                            updatePreview()
+                        }
+                    },
+                )
+            }
+
+        fun updateCustomFieldsVisibility(framework: LoggingSettings.LoggingFramework) {
+            val isCustom = framework == LoggingSettings.LoggingFramework.CUSTOM
+            customKotlinTemplateLabel.isVisible = isCustom
+            customKotlinTemplateField.isVisible = isCustom
+            customJavaTemplateLabel.isVisible = isCustom
+            customJavaTemplateField.isVisible = isCustom
+            customImportLabel.isVisible = isCustom
+            customImportField.isVisible = isCustom
+        }
+
         val frameworkModel = CollectionComboBoxModel(LoggingSettings.LoggingFramework.entries)
         val frameworkCombo =
             ComboBox(frameworkModel).apply {
                 renderer = SimpleListCellRenderer.create("") { it.displayName }
                 selectedItem = settings.state.loggingFramework
                 addActionListener {
-                    settings.state.loggingFramework = selectedItem as LoggingSettings.LoggingFramework
+                    val selected = selectedItem as LoggingSettings.LoggingFramework
+                    settings.state.loggingFramework = selected
+                    updateCustomFieldsVisibility(selected)
                     updatePreview()
                 }
             }
@@ -144,6 +225,18 @@ class LoggingToolWindowFactory : ToolWindowFactory {
         constraints.gridy++
         settingsPanel.add(frameworkCombo, constraints)
         constraints.gridy++
+        settingsPanel.add(customKotlinTemplateLabel, constraints)
+        constraints.gridy++
+        settingsPanel.add(customKotlinTemplateField, constraints)
+        constraints.gridy++
+        settingsPanel.add(customJavaTemplateLabel, constraints)
+        constraints.gridy++
+        settingsPanel.add(customJavaTemplateField, constraints)
+        constraints.gridy++
+        settingsPanel.add(customImportLabel, constraints)
+        constraints.gridy++
+        settingsPanel.add(customImportField, constraints)
+        constraints.gridy++
         settingsPanel.add(JBLabel("Log Tag:"), constraints)
         constraints.gridy++
         settingsPanel.add(tagField, constraints)
@@ -155,6 +248,7 @@ class LoggingToolWindowFactory : ToolWindowFactory {
         mainPanel.add(settingsPanel, BorderLayout.NORTH)
         mainPanel.add(previewArea, BorderLayout.CENTER)
 
+        updateCustomFieldsVisibility(settings.state.loggingFramework)
         updatePreview()
 
         val content = ContentFactory.getInstance().createContent(mainPanel, "", false)

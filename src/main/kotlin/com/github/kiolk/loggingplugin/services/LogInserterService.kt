@@ -9,6 +9,7 @@ import com.intellij.psi.PsiCodeBlock
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpressionStatement
+import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiWhiteSpace
@@ -28,7 +29,7 @@ class LogInserterService(private val project: Project) {
         logTag: String,
         framework: LoggingSettings.LoggingFramework = LoggingSettings.LoggingFramework.PRINTLN,
     ) {
-        val strategy = LogStrategyFactory.getStrategy(framework)
+        val strategy = LogStrategyFactory.getStrategy(framework, LoggingSettings.getInstance(project).state)
         val factory = KtPsiFactory(project)
         val assignments =
             PsiTreeUtil.findChildrenOfType(
@@ -72,7 +73,7 @@ class LogInserterService(private val project: Project) {
         logTag: String,
         framework: LoggingSettings.LoggingFramework = LoggingSettings.LoggingFramework.PRINTLN,
     ) {
-        val strategy = LogStrategyFactory.getStrategy(framework)
+        val strategy = LogStrategyFactory.getStrategy(framework, LoggingSettings.getInstance(project).state)
         val factory = KtPsiFactory(project)
         val functions =
             PsiTreeUtil.findChildrenOfType(
@@ -114,7 +115,7 @@ class LogInserterService(private val project: Project) {
         logTag: String,
         framework: LoggingSettings.LoggingFramework = LoggingSettings.LoggingFramework.PRINTLN,
     ) {
-        val strategy = LogStrategyFactory.getStrategy(framework)
+        val strategy = LogStrategyFactory.getStrategy(framework, LoggingSettings.getInstance(project).state)
         val factory = JavaPsiFacade.getElementFactory(project)
         val methods =
             PsiTreeUtil.findChildrenOfType(searchScope, PsiMethod::class.java)
@@ -146,7 +147,7 @@ class LogInserterService(private val project: Project) {
         logTag: String,
         framework: LoggingSettings.LoggingFramework = LoggingSettings.LoggingFramework.PRINTLN,
     ) {
-        val strategy = LogStrategyFactory.getStrategy(framework)
+        val strategy = LogStrategyFactory.getStrategy(framework, LoggingSettings.getInstance(project).state)
         val factory = JavaPsiFacade.getElementFactory(project)
         val assignments =
             PsiTreeUtil.findChildrenOfType(
@@ -205,9 +206,20 @@ class LogInserterService(private val project: Project) {
 
         val psiClass =
             JavaPsiFacade.getInstance(project)
-                .findClass(importPath, file.resolveScope) ?: return
-        val importStatement = factory.createImportStatement(psiClass)
-        importList.add(importStatement)
+                .findClass(importPath, file.resolveScope)
+        if (psiClass != null) {
+            val importStatement = factory.createImportStatement(psiClass)
+            importList.add(importStatement)
+        } else {
+            val tempFile =
+                PsiFileFactory.getInstance(project).createFileFromText(
+                    "Dummy.java",
+                    com.intellij.lang.java.JavaLanguage.INSTANCE,
+                    "import $importPath;\nclass Dummy {}",
+                ) as PsiJavaFile
+            val importStatement = tempFile.importList?.allImportStatements?.firstOrNull() ?: return
+            importList.add(importStatement)
+        }
     }
 
     fun removeLogs(
@@ -215,7 +227,7 @@ class LogInserterService(private val project: Project) {
         logTag: String,
         framework: LoggingSettings.LoggingFramework = LoggingSettings.LoggingFramework.PRINTLN,
     ) {
-        val strategy = LogStrategyFactory.getStrategy(framework)
+        val strategy = LogStrategyFactory.getStrategy(framework, LoggingSettings.getInstance(project).state)
         val patterns = strategy.getRemovalPatterns(logTag)
 
         if (searchScope.containingFile is PsiJavaFile) {
