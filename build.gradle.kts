@@ -8,7 +8,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
 }
 
-version = "1.1.1"
+version = "1.2.0"
 group = "com.github.kiolk.loggingplugin"
 
 repositories {

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-06
+
+### Changed
+- Compatible with the latest Android Studio and IntelliJ IDEA releases (2026.2); removed the upper IDE version limit
+- Upgraded build tooling: Gradle 9.8, Kotlin 2.4.20, IntelliJ Platform Gradle Plugin 2.19, ktlint Gradle plugin 14.2
+
 ## [1.1.0] - 2026-04-08
 
 ### Added
