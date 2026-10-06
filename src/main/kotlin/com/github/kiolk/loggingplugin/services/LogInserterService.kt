@@ -21,9 +21,12 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
+import org.jetbrains.kotlin.resolve.ImportPath
 
 @Service(Service.Level.PROJECT)
-class LogInserterService(private val project: Project) {
+class LogInserterService(
+    private val project: Project,
+) {
     fun insertKotlinAssignmentLogs(
         searchScope: PsiElement,
         logTag: String,
@@ -32,11 +35,11 @@ class LogInserterService(private val project: Project) {
         val strategy = LogStrategyFactory.getStrategy(framework, LoggingSettings.getInstance(project).state)
         val factory = KtPsiFactory(project)
         val assignments =
-            PsiTreeUtil.findChildrenOfType(
-                searchScope,
-                org.jetbrains.kotlin.psi.KtBinaryExpression::class.java,
-            )
-                .filter {
+            PsiTreeUtil
+                .findChildrenOfType(
+                    searchScope,
+                    org.jetbrains.kotlin.psi.KtBinaryExpression::class.java,
+                ).filter {
                     it.operationToken in
                         listOf(
                             org.jetbrains.kotlin.lexer.KtTokens.EQ,
@@ -185,7 +188,7 @@ class LogInserterService(private val project: Project) {
 
         val newImport =
             factory.createImportDirective(
-                org.jetbrains.kotlin.resolve.ImportPath.fromString(importPath),
+                ImportPath.fromString(importPath),
             )
         if (importList == null) {
             val packageDirective = file.packageDirective
@@ -205,7 +208,8 @@ class LogInserterService(private val project: Project) {
         if (importList.findSingleClassImportStatement(importPath) != null) return
 
         val psiClass =
-            JavaPsiFacade.getInstance(project)
+            JavaPsiFacade
+                .getInstance(project)
                 .findClass(importPath, file.resolveScope)
         if (psiClass != null) {
             val importStatement = factory.createImportStatement(psiClass)
@@ -237,7 +241,8 @@ class LogInserterService(private val project: Project) {
                     searchScope,
                     PsiExpressionStatement::class.java,
                 )
-            statements.filter { stmt -> patterns.any { stmt.text.contains(it) } }
+            statements
+                .filter { stmt -> patterns.any { stmt.text.contains(it) } }
                 .forEach { it.delete() }
             removeJavaImportIfUnused(file, strategy.getJavaImport())
         } else if (searchScope.containingFile is KtFile) {
@@ -270,8 +275,7 @@ class LogInserterService(private val project: Project) {
                     toDelete.none { other ->
                         other !== candidate && PsiTreeUtil.isAncestor(candidate, other, true)
                     }
-                }
-                .forEach { it.delete() }
+                }.forEach { it.delete() }
             removeKotlinImportIfUnused(file, strategy.getKotlinImport())
         }
     }
@@ -289,7 +293,8 @@ class LogInserterService(private val project: Project) {
                 .filter { !it.trimStart().startsWith("import ") }
                 .any { pattern.containsMatchIn(it) }
         if (hasRemainingUsage) return
-        file.importList?.imports
+        file.importList
+            ?.imports
             ?.find { it.importPath?.pathStr == importPath }
             ?.delete()
     }
