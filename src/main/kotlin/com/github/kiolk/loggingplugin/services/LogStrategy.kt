@@ -141,8 +141,8 @@ object LogStrategyFactory {
     fun getStrategy(
         framework: LoggingSettings.LoggingFramework,
         state: LoggingSettings.State? = null,
-    ): LogStrategy {
-        return when (framework) {
+    ): LogStrategy =
+        when (framework) {
             LoggingSettings.LoggingFramework.PRINTLN -> PrintlnStrategy()
             LoggingSettings.LoggingFramework.ANDROID_LOG -> AndroidLogStrategy()
             LoggingSettings.LoggingFramework.TIMBER -> TimberStrategy()
@@ -154,5 +154,4 @@ object LogStrategyFactory {
                     state?.customImport,
                 )
         }
-    }
 }

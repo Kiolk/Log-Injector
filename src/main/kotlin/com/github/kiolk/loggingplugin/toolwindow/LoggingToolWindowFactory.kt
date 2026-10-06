@@ -14,6 +14,7 @@ import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.content.ContentFactory
 import com.intellij.util.ui.JBUI
+import org.jetbrains.kotlin.psi.KtPsiFactory
 import java.awt.BorderLayout
 import java.awt.Font
 import java.awt.GridBagConstraints
@@ -65,7 +66,7 @@ class LoggingToolWindowFactory : ToolWindowFactory {
             val strategy = LogStrategyFactory.getStrategy(state.loggingFramework, state)
             val preview = StringBuilder()
 
-            val ktFactory = org.jetbrains.kotlin.psi.KtPsiFactory(project)
+            val ktFactory = KtPsiFactory(project)
 
             val kotlinImport = strategy.getKotlinImport()
             if (kotlinImport != null) {

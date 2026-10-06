@@ -10,7 +10,9 @@ import com.intellij.openapi.project.Project
 @Service(Service.Level.PROJECT)
 @State(name = "LoggingSettings", storages = [Storage("loggingSettings.xml")])
 class LoggingSettings : PersistentStateComponent<LoggingSettings.State> {
-    enum class LoggingFramework(val displayName: String) {
+    enum class LoggingFramework(
+        val displayName: String,
+    ) {
         PRINTLN("System Println"),
         ANDROID_LOG("Android Log"),
         TIMBER("Timber"),
