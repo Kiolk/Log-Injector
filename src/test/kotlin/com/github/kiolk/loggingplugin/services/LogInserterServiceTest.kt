@@ -619,6 +619,70 @@ class LogInserterServiceTest : BasePlatformTestCase() {
         myFixture.checkResult(after)
     }
 
+    fun testInsertJavaAssignmentLogs() {
+        val before =
+            """
+            public class Test {
+                public void test() {
+                    int x = 1;
+                    x = 2;
+                }
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            public class Test {
+                public void test() {
+                    int x = 1;
+                    x = 2;
+                    System.out.println("TestTag: x assigned new value: " + x);
+                }
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.java", before)
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.insertJavaAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.PRINTLN)
+        }
+
+        myFixture.checkResult(after)
+    }
+
+    fun testInsertJavaAssignmentTimberLogs() {
+        val before =
+            """
+            public class Test {
+                public void test() {
+                    int x = 1;
+                    x = 2;
+                }
+            }
+            """.trimIndent()
+
+        val after =
+            """
+            import timber.log.Timber;
+
+            public class Test {
+                public void test() {
+                    int x = 1;
+                    x = 2;
+                    Timber.tag("TestTag").d("x assigned new value: " + x);
+                }
+            }
+            """.trimIndent()
+
+        val psiFile = myFixture.configureByText("Test.java", before)
+
+        WriteCommandAction.runWriteCommandAction(project) {
+            service.insertJavaAssignmentLogs(psiFile, "TestTag", LoggingSettings.LoggingFramework.TIMBER)
+        }
+
+        myFixture.checkResult(after)
+    }
+
     fun testInsertKotlinAssignmentNapierLogs() {
         val before =
             """

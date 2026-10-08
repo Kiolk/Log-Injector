@@ -24,6 +24,14 @@ interface LogStrategy {
     fun getJavaImport(): String?
 }
 
+/**
+ * Java messages may embed concatenations, e.g. `test(param=" + param + ")` (closed)
+ * or `x assigned new value: " + x` (ends with a variable, so it must not get a closing quote).
+ */
+internal fun endsWithOpenConcatenation(message: String): Boolean = message.count { it == '"' } % 2 == 1
+
+internal fun javaStringExpression(message: String): String = if (endsWithOpenConcatenation(message)) "\"$message" else "\"$message\""
+
 class PrintlnStrategy : LogStrategy {
     override fun createKotlinLog(
         factory: KtPsiFactory,
@@ -35,7 +43,7 @@ class PrintlnStrategy : LogStrategy {
         factory: PsiElementFactory,
         tag: String,
         message: String,
-    ): String = "System.out.println(\"$tag: $message\");"
+    ): String = "System.out.println(${javaStringExpression("$tag: $message")});"
 
     override fun getRemovalPatterns(tag: String): List<String> = listOf(tag)
 
@@ -55,7 +63,7 @@ class AndroidLogStrategy : LogStrategy {
         factory: PsiElementFactory,
         tag: String,
         message: String,
-    ): String = "Log.d(\"$tag\", \"$message\");"
+    ): String = "Log.d(\"$tag\", ${javaStringExpression(message)});"
 
     override fun getRemovalPatterns(tag: String): List<String> = listOf("Log.d(\"$tag\"", tag)
 
@@ -75,7 +83,7 @@ class TimberStrategy : LogStrategy {
         factory: PsiElementFactory,
         tag: String,
         message: String,
-    ): String = "Timber.tag(\"$tag\").d(\"$message\");"
+    ): String = "Timber.tag(\"$tag\").d(${javaStringExpression(message)});"
 
     override fun getRemovalPatterns(tag: String): List<String> = listOf("Timber.tag(\"$tag\")", tag)
 
@@ -95,7 +103,7 @@ class NapierStrategy : LogStrategy {
         factory: PsiElementFactory,
         tag: String,
         message: String,
-    ): String = "Napier.d(\"$message\", tag = \"$tag\");"
+    ): String = "Napier.d(${javaStringExpression(message)}, tag = \"$tag\");"
 
     override fun getRemovalPatterns(tag: String): List<String> = listOf("tag = \"$tag\"", tag)
 
@@ -121,8 +129,8 @@ class CustomLogStrategy(
         message: String,
     ): String {
         val tagReplaced = javaTemplate.replace("{tag}", tag)
-        return if (message.endsWith(")")) {
-            // Method-style: message ends with ")", the template's closing " is needed to form the ")" string literal
+        return if (!endsWithOpenConcatenation(message)) {
+            // Method-style: message is a closed string (e.g. ends with ")"), the template's closing " is needed
             tagReplaced.replace("{message}", message)
         } else {
             // Assignment-style: message ends with a variable (e.g. " + x"), no closing " from template needed

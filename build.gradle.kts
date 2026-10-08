@@ -77,6 +77,37 @@ intellijPlatform {
     }
 }
 
+// Runs the regular test suite against other IDE builds than the one we compile against.
+//   ./gradlew testIdeLatest
+//   ./gradlew testIdeCustom -PtestIdeType=AndroidStudio -PtestIdeVersion=<build>
+intellijPlatformTesting {
+    testIde {
+        register("testIdeLatest") {
+            type = IntelliJPlatformType.IntellijIdea
+            version = "2026.2.3"
+            testFramework(TestFrameworkType.Platform)
+            plugins {
+                // The unified IDEA distribution bundles the obfuscated Ultimate plugin, which can't start in tests.
+                disablePlugin("com.intellij.modules.ultimate")
+            }
+            task {
+                useJUnitPlatform()
+            }
+        }
+        register("testIdeCustom") {
+            type = providers.gradleProperty("testIdeType").map { IntelliJPlatformType.valueOf(it) }
+            version = providers.gradleProperty("testIdeVersion")
+            testFramework(TestFrameworkType.Platform)
+            plugins {
+                disablePlugin("com.intellij.modules.ultimate")
+            }
+            task {
+                useJUnitPlatform()
+            }
+        }
+    }
+}
+
 // Kotlin JVM toolchain is automatically configured by IntelliJ Platform Plugin
 // kotlin {
 //     jvmToolchain(21)
