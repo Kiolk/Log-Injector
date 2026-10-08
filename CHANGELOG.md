@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-10-08
+
+### Fixed
+- Assignment logs inserted into Java files no longer have a stray closing quote that broke compilation (System.out.println, Android Log and Timber frameworks)
+
 ## [1.2.0] - 2026-10-06
 
 ### Changed
